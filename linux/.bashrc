@@ -16,8 +16,8 @@ HISTCONTROL=ignoreboth
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=10000
+HISTFILESIZE=20000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -76,7 +76,7 @@ esac
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls -la --color=auto'
+    alias ls='ls -lah --color=auto'
     #alias dir='dir --color=auto'
     #alias vdir='vdir --color=auto'
 
@@ -102,7 +102,6 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 # You may want to put all your additions into a separate file like
 # ~/.bash_aliases, instead of adding them here directly.
 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
@@ -118,6 +117,10 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# Terminal Clipboard
+alias getclip="xclip -selection c -o"                        # Paste from Clipboard
+alias setclip="xclip -selection c && xclip -selection c -o"  # Copy to Clipboard
+
 # PyEnv Exports
 export PATH="~/.pyenv/bin:$PATH"
 eval "$(pyenv init -)"
@@ -128,7 +131,7 @@ export PYTHON_CONFIGURE_OPTS="--enable-shared"
 if test -f $XDG_RUNTIME_DIR/gpg-agent-info && kill -0 $(head -n 1 $XDG_RUNTIME_DIR/gpg-agent-info | cut -d: -f2) 2>/dev/null ; then
         eval $(< $XDG_RUNTIME_DIR/gpg-agent-info)
     else
-	   #eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $XDG_RUNTIME_DIR/gpg-agent-info)
+	#eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $XDG_RUNTIME_DIR/gpg-agent-info)
         eval $(gpg-agent --daemon --enable-ssh-support)
 fi
 export GPG_AGENT_INFO
