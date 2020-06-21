@@ -1,0 +1,7 @@
+[user]
+	name = Marcos Azevedo (psylinux)
+	email = psylinux@gmail.com
+[push]
+	default = simple
+[core]
+	excludesfile = /home/psylinux/.gitignore
