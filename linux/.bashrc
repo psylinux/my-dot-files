@@ -128,7 +128,7 @@ export PYTHON_CONFIGURE_OPTS="--enable-shared"
 if test -f $XDG_RUNTIME_DIR/gpg-agent-info && kill -0 $(head -n 1 $XDG_RUNTIME_DIR/gpg-agent-info | cut -d: -f2) 2>/dev/null ; then
         eval $(< $XDG_RUNTIME_DIR/gpg-agent-info)
     else
-	#eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $XDG_RUNTIME_DIR/gpg-agent-info)
+	   #eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $XDG_RUNTIME_DIR/gpg-agent-info)
         eval $(gpg-agent --daemon --enable-ssh-support)
 fi
 export GPG_AGENT_INFO
