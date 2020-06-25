@@ -117,6 +117,12 @@ if ! shopt -oq posix; then
   fi
 fi
 
+# Customized PATH
+export PATH="/usr/sbin:/usr/local/sbin/:$PATH"
+
+# Mounting VMWare Shared Folders
+/usr/local/sbin/mount-shared-folders
+
 # Terminal Clipboard
 alias getclip="xclip -selection c -o"                        # Paste from Clipboard
 alias setclip="xclip -selection c && xclip -selection c -o"  # Copy to Clipboard
@@ -142,3 +148,5 @@ test "$(ps -ocommand= -p $PPID | awk '{print $1}')" == 'script' || (script -f $H
 echo -e "========================================="
 echo -e "*******   `date +"%d-%b-%y %T"`   *******"
 echo -e "========================================="
+
+
