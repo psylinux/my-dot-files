@@ -1,4 +1,6 @@
 #!/bin/sh
+# Move this file to /usr/local/sbin
+
 systemctl stop vmtoolsd
 systemctl stop run-vmblock\\x2dfuse.mount
 killall -q -w vmtoolsd
