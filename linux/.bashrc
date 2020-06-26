@@ -118,7 +118,7 @@ if ! shopt -oq posix; then
 fi
 
 # Customized PATH
-export PATH="/usr/sbin:/usr/local/sbin/:$PATH"
+export PATH="$HOME/go/bin:/usr/sbin:/usr/local/sbin/:$PATH"
 
 # Mounting VMWare Shared Folders
 /usr/local/sbin/mount-shared-folders
