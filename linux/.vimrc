@@ -4,7 +4,6 @@
 " Created: 2010-03-11
 " Updated: 2020-07-02
 " Description: VIMRC Configuration
-" Ref: https://github.com/skwp
 "
 " ==[ Dependencies ]
 " # Install vim with +python3 support:
@@ -38,6 +37,11 @@
 " # Install flake8
 "   brew install flake8
 "
+" # Install yarn
+"   asdf plugin-add yarn
+"   asdf install yarn 1.22.4
+"   cd /home/psylinux/.vim/bundle/markdown-preview.nvim/app/
+"   asdf local yarn 1.22.4
 
 " ----------------------------------------------------
 " ================ Initial Config ====================
@@ -115,7 +119,8 @@ call vundle#begin()
   "Plugin 'janko-m/vim-test'
 
   " Markdown / Writting
-  Plugin 'reedes/vim-pencil'
+  Plugin 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
+  "Plugin 'reedes/vim-pencil'
   Plugin 'tpope/vim-markdown'
   Plugin 'jtratner/vim-flavored-markdown'
   Plugin 'LanguageTool'
@@ -311,15 +316,15 @@ augroup END
 let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 
 " Settings for Writting
-let g:pencil#wrapModeDefault = 'soft'   " default is 'hard'
 let g:languagetool_jar = '/opt/languagetool/languagetool-commandline.jar'
 
 " Vim-pencil Configuration
-augroup pencil
-  autocmd!
-  autocmd FileType markdown,mkd,md  call pencil#init()
-  autocmd FileType text             call pencil#init()
-augroup END
+"let g:pencil#wrapModeDefault = 'soft'   " default is 'hard'
+"augroup pencil
+"  autocmd!
+"  autocmd FileType markdown,mkd,md  call pencil#init()
+"  autocmd FileType text             call pencil#init()
+"augroup END
 
 " Vim-UtilSnips Configuration
 " Trigger configuration.
@@ -374,6 +379,11 @@ let g:webdevicons_enable_nerdtree=1             "Adding the flags to NERDTree
 let g:webdevicons_conceal_nerdtree_brackets=1
 let g:WebDevIconsNerdTreeAfterGlyphPadding=' '
 
+"""" iamcco/markdown-preview.nvim
+let g:mkdp_auto_close=0
+let g:mkdp_refresh_slow=1
+let g:mkdp_markdown_css='~/.local/share/github-markdown-css/github-markdown.css'
+
 
 " ----------------------------------------------------
 " ============ Mappings configurationn ===============
@@ -393,7 +403,7 @@ inoremap <expr><C-g>     neocomplete#undo_completion()
 inoremap <expr><C-l>     neocomplete#complete_common_string()
 
 " [Neocomplete] <TAB>: completion
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+inoremap <expr> <tab> pumvisible() ? "\<C-n>" : "\<tab>"
 
 " [Neocomplete] <C-h>, <BS>: close popup and delete backword char.
 inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
@@ -424,19 +434,24 @@ imap <c-x><c-l> <plug>(fzf-complete-line)
 
 " Disable arrow movement, resize splits instead.
 if get(g:, 'elite_mode')
-	nnoremap <Up>    :resize +2<CR>
-	nnoremap <Down>  :resize -2<CR>
-	nnoremap <Left>  :vertical resize +2<CR>
-	nnoremap <Right> :vertical resize -2<CR>
+	nnoremap <Up>    :resize -2<CR>
+	nnoremap <Down>  :resize +2<CR>
+	nnoremap <Left>  :vertical resize -2<CR>
+	nnoremap <Right> :vertical resize +2<CR>
 endif
 
 map <silent> <LocalLeader>ws :highlight clear ExtraWhitespace<CR>
 
 " Advanced customization using autoload functions
-inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '15%'})
+inoremap <expr> <c-x><c-k> fzf#vim#complete#word({'left': '12%'})
 
 " Tabularize
 nmap <leader>a= :Tabularize /=<CR>
 vmap <leader>a= :Tabularize /=<CR>
 nmap <leader>a: :Tabularize /:\zs<CR>
 vmap <leader>a: :Tabularize /:\zs<CR>
+
+" Edit vimr configuration file
+nnoremap <Leader>ve :e $MYVIMRC<CR>
+" Reload vimr configuration file
+nnoremap <Leader>vr :source $MYVIMRC<CR>
