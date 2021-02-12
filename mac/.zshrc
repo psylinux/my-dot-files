@@ -80,7 +80,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git git-extras pip asdf nmap bundler python zsh-navigation-tools xcode vundle zfz)
+plugins=(git git-extras asdf nmap bundler python zsh-navigation-tools xcode vundle fzf brew ssh-agent vscode)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -116,3 +116,6 @@ alias ls="ls -laHG"
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
+
