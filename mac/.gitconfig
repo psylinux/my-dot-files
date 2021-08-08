@@ -1,0 +1,11 @@
+[user]
+	name = Marcos Azevedo (psylinux)
+	email = psylinux@gmail.com
+[push]
+	default = simple
+[core]
+	excludesFile = /Users/cowboy/.gitignore
+[url "ssh://git@git.corp.c6bank.com:7999/"]
+    insteadOf = https://git.corp.c6bank.com/scm/
+[pull]
+	rebase = false
