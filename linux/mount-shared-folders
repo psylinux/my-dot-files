@@ -1,5 +1,7 @@
 #!/bin/sh
-# Move this file to /usr/local/sbin
+#
+# To install, just move this file to /usr/local/sbin
+#
 
 vmware-hgfsclient | while read folder; do {
     vmwpath="/mnt/hgfs/${folder}"
