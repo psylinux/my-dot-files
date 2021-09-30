@@ -37,14 +37,17 @@ printf "Processor Type: ";uname -m
 echo "------------------------------"
 echo "     Performing updates:      "
 echo "------------------------------"
-echo "----- CLEAN -----"
-apt-get clean
 echo "----- UPDATE -----"
 apt-get update
 echo "----- FULL-DIST-UPGRADE -----"
 apt-get full-upgrade -y
+apt-get dist-upgrade -y
 echo "----- AUTOREMOVE -----"
 apt-get autoremove -y
+echo "----- CLEAN -----"
+apt-get clean
+echo "---- REMOVING OLD KERNELS ----"
+./remove-old-kernel.sh
 echo "------------------------------"
 echo " Device Version Info Follows: "
 echo "------------------------------"
