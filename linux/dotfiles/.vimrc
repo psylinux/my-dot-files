@@ -2,7 +2,7 @@
 " Author: Marcos Azevedo aka psylinux
 " Email: psylinux@gmail.com
 " Created: 2010-03-11
-" Updated: 2020-07-02
+" Updated: 2023-07-17
 " Description: VIMRC Configuration
 "
 " ==[ Dependencies ]
