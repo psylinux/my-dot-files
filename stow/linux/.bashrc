@@ -175,20 +175,20 @@ eval "$(pyenv virtualenv-init -)"
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 
 # SSH Agent Exports
-if test -f $XDG_RUNTIME_DIR/gpg-agent-info && kill -0 $(head -n 1 $XDG_RUNTIME_DIR/gpg-agent-info | cut -d: -f2) 2>/dev/null ; then
-    eval $(< $XDG_RUNTIME_DIR/gpg-agent-info)
-else
-	#eval $(gpg-agent --daemon --enable-ssh-support --write-env-file $XDG_RUNTIME_DIR/gpg-agent-info)
-    eval $(gpg-agent --daemon --enable-ssh-support)
+# Iniciar ssh-agent automaticamente se não houver um agent útil
+if ! ssh-add -l >/dev/null 2>&1; then
+    # Inicia um novo agent e exporta SSH_AUTH_SOCK/SSH_AGENT_PID neste shell
+    eval "$(ssh-agent -s)" >/dev/null
+
+    # Adiciona as chaves que você usa (ajuste os nomes se precisar)
+    ssh-add ~/.ssh/id_ed25519 ~/.ssh/id_rsa 2>/dev/null
 fi
-export GPG_AGENT_INFO
-export SSH_AUTH_SOCK
 
 # Customized PATH
 export PATH="$HOME/.local/bin:$HOME/go/bin:/usr/sbin:/usr/local/sbin:$PATH"
 
 # Recording the session
 test "$(ps -ocommand= -p $PPID | awk '{print $1}')" == 'script' || (script -f $HOME/logs/$(date +"%d-%b-%y_%H-%M-%S")_shell.log)
-echo -e "========================================="
-echo -e "*******   `date +"%d-%b-%y %T"`   *******"
-echo -e "========================================="
+echo -e "===================================================================================="
+echo -e "*****************************  Recording this session  *****************************"
+echo -e "===================================================================================="
