@@ -3,16 +3,16 @@
 This repo centralizes personal dotfiles and helper scripts for Linux and macOS. Keep changes small, reproducible, and documented so contributors can safely mirror updates across platforms.
 
 ## Project Structure & Module Organization
-- `linux/` holds platform-specific helpers; `deb-update.sh`, `fedora-update.sh`, and maintenance scripts live here.
-- `linux/dotfiles/` contains the canonical shell/editor configs (`.bashrc`, `.vimrc`, `.tmux.conf`, `.gitconfig`, `.git-prompt.sh`, `.irssi`, `.vim/`).
-- `linux/setup-tools/` provides setup automation (`deb-setup.sh`, `vim-setup.zsh`); `img-editing/` hosts utility scripts such as `muda-extensao.sh` and `redimensiona.sh`.
-- `mac/` stores macOS-specific agent settings (`gpg-agent.conf`, `sshcontrol`).
-- `Sublime-Configs.zip` archives Sublime Text settings; update only when format is stable.
+- `stow/common` is for shared assets across platforms (currently `.gitignore`).
+- `stow/linux` is the Stow package for Linux (`.bashrc`, `.vimrc`, `.tmux.conf`, `.gitconfig`, `.git-prompt.sh`, `.irssi`, `.vim/colors`, `.local/bin` helpers).
+- `stow/mac` is the macOS package (`.zshrc`, `.p10k.zsh`, `.tmux.conf`, `.gitconfig`, `.gnupg/gpg-agent.conf`, `.gnupg/sshcontrol`).
+- `scripts/linux` keeps one-off setup helpers (e.g., `vim-setup.zsh`).
+- `.ssh/` is tracked here but keep private material out of version control.
 
 ## Build, Test, and Development Commands
-- No build step; validate shell scripts with `bash -n linux/deb-update.sh` (or target file) before pushing.
-- Run static checks when available: `shellcheck linux/remove-old-kernel.sh`.
-- For dotfiles, spot-check loadability: `tmux source-file linux/dotfiles/.tmux.conf`, `vim -u linux/dotfiles/.vimrc +qall`, and `source linux/dotfiles/.bashrc` inside a throwaway shell.
+- No build step; validate shell scripts with `bash -n stow/linux/.local/bin/deb-update.sh` (or the target file) before pushing.
+- Run static checks when available: `shellcheck stow/linux/.local/bin/remove-old-kernel.sh`.
+- For dotfiles, spot-check loadability: `tmux source-file stow/linux/.tmux.conf`, `vim -u stow/linux/.vimrc +qall`, `source stow/linux/.bashrc`, and `source stow/mac/.zshrc` inside a throwaway shell.
 - Prefer non-interactive flows (`apt-get … -y`) and echo progress logs similar to existing scripts to aid remote debugging.
 
 ## Coding Style & Naming Conventions
