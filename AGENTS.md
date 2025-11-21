@@ -1,0 +1,34 @@
+# Repository Guidelines
+
+This repo centralizes personal dotfiles and helper scripts for Linux and macOS. Keep changes small, reproducible, and documented so contributors can safely mirror updates across platforms.
+
+## Project Structure & Module Organization
+- `linux/` holds platform-specific helpers; `deb-update.sh`, `fedora-update.sh`, and maintenance scripts live here.
+- `linux/dotfiles/` contains the canonical shell/editor configs (`.bashrc`, `.vimrc`, `.tmux.conf`, `.gitconfig`, `.git-prompt.sh`, `.irssi`, `.vim/`).
+- `linux/setup-tools/` provides setup automation (`deb-setup.sh`, `vim-setup.zsh`); `img-editing/` hosts utility scripts such as `muda-extensao.sh` and `redimensiona.sh`.
+- `mac/` stores macOS-specific agent settings (`gpg-agent.conf`, `sshcontrol`).
+- `Sublime-Configs.zip` archives Sublime Text settings; update only when format is stable.
+
+## Build, Test, and Development Commands
+- No build step; validate shell scripts with `bash -n linux/deb-update.sh` (or target file) before pushing.
+- Run static checks when available: `shellcheck linux/remove-old-kernel.sh`.
+- For dotfiles, spot-check loadability: `tmux source-file linux/dotfiles/.tmux.conf`, `vim -u linux/dotfiles/.vimrc +qall`, and `source linux/dotfiles/.bashrc` inside a throwaway shell.
+- Prefer non-interactive flows (`apt-get … -y`) and echo progress logs similar to existing scripts to aid remote debugging.
+
+## Coding Style & Naming Conventions
+- Bash scripts should start with `#!/bin/bash`, use lowercase-hyphenated filenames, and favor readable pipelines over long one-liners.
+- Quote variables, use `set -euo pipefail` for new scripts unless it breaks existing flows, and keep indentation consistent (2 spaces is preferred when adding blocks).
+- Echo section headers (as in `deb-update.sh`) to make logs scannable; keep user prompts avoided unless guarded by a flag.
+- Keep config defaults minimal; mirror existing key ordering in dotfiles to reduce diff noise.
+
+## Testing Guidelines
+- Exercise update scripts in a disposable VM/container that matches the target distro before merging; avoid running destructive commands on hosts you cannot rebuild.
+- When touching `remove-old-kernel.sh`, dry-run logic by printing candidate packages first; confirm the exclusion regex still protects the running kernel.
+- Add brief usage examples in comments when behavior is non-obvious (e.g., required env vars, expected directory layout).
+- If a change affects multiple platforms, test both `linux/` and `mac/` flows or note what remains unverified.
+
+## Commit & Pull Request Guidelines
+- Follow existing commit tone: short, capitalized summaries in present tense (e.g., “Modifying `.vimrc` and `.tmux.conf`”); keep to ~72 characters.
+- Include what changed, why, and any side effects in the PR description; link issues when relevant.
+- Capture validation steps (commands run, platforms tested) and attach logs or screenshots when visual behavior changes (e.g., tmux status tweaks, Vim color changes).
+- Avoid bundling refactors with behavioral changes unless tightly coupled; call out any remaining TODOs or follow-up items.
