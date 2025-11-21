@@ -223,6 +223,60 @@ install_vim_tools_apt() {
   sudo apt-get install -y vim-python-jedi || log "vim-python-jedi not available; skipping."
 }
 
+install_tmux_plugins() {
+  log "Installing tmux plugins (tpm and vim-tmux-focus-events)"
+  mkdir -p "${HOME}/.tmux/plugins"
+  if [ ! -d "${HOME}/.tmux/plugins/tpm/.git" ]; then
+    git clone https://github.com/tmux-plugins/tpm "${HOME}/.tmux/plugins/tpm"
+  else
+    git -C "${HOME}/.tmux/plugins/tpm" pull --quiet
+  fi
+  if [ ! -d "${HOME}/.tmux/plugins/vim-tmux-focus-events/.git" ]; then
+    git clone https://github.com/tmux-plugins/vim-tmux-focus-events "${HOME}/.tmux/plugins/vim-tmux-focus-events"
+  else
+    git -C "${HOME}/.tmux/plugins/vim-tmux-focus-events" pull --quiet
+  fi
+  log "Reload tmux (prefix + r) and press prefix + I inside tmux to fetch plugins."
+}
+
+ensure_logs_cron() {
+  # 1) Compactar logs .log com mais de 30 dias
+  local cron_cmd_archive="find ${HOME}/logs -maxdepth 1 -type f -name '*.log' -mtime +30 -print0 | tar -czf ${HOME}/logs/archive-last-30days.tar.gz --null -T -"
+  local cron_line_archive="0 11 * * * ${cron_cmd_archive}"
+
+  # 2) Apagar logs .log com mais de 30 dias
+  local cron_cmd_delete="find ${HOME}/logs -maxdepth 1 -type f -name '*.log' -mtime +30 -delete"
+  local cron_line_delete="10 11 * * * ${cron_cmd_delete}"
+
+  local tmp_cron
+  tmp_cron="$(mktemp)"
+  crontab -l 2>/dev/null > "${tmp_cron}" || true
+
+  local updated=false
+
+  # Garante que a linha de arquivamento existe
+  if ! grep -Fq "${cron_line_archive}" "${tmp_cron}"; then
+    printf '%s\n' "${cron_line_archive}" >> "${tmp_cron}"
+    updated=true
+  fi
+
+  # Garante que a linha de deleção existe
+  if ! grep -Fq "${cron_line_delete}" "${tmp_cron}"; then
+    printf '%s\n' "${cron_line_delete}" >> "${tmp_cron}"
+    updated=true
+  fi
+
+  if [ "${updated}" = true ]; then
+    crontab "${tmp_cron}"
+    log "Installed cron to archive and delete ~/logs files older than 30 days (archive at 11:00, delete at 11:10)."
+  else
+    log "Cron for archiving and deleting ~/logs already present."
+  fi
+
+  rm -f "${tmp_cron}"
+}
+
+
 run_debian_flow() {
   install_packages_apt
   install_ctags_apt
@@ -233,6 +287,8 @@ run_debian_flow() {
   install_vundle
   install_gef
   install_vim_tools_apt
+  install_tmux_plugins
+  ensure_logs_cron
 }
 
 main() {
