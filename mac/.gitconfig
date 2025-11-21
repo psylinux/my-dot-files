@@ -1,9 +1,0 @@
-[user]
-	name = Marcos Azevedo (psylinux)
-	email = psylinux@gmail.com
-[push]
-	default = simple
-[core]
-	excludesFile = /Users/cowboy/.gitignore
-[pull]
-	rebase = false
