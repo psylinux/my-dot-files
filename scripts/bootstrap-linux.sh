@@ -286,6 +286,7 @@ backup_conflicts() {
     ".tmux.conf"
     ".vimrc"
     ".vim"
+    ".irssi"
     ".git-prompt.sh"
   )
 
@@ -317,6 +318,7 @@ remove_stale_symlinks() {
     ".tmux.conf"
     ".vimrc"
     ".vim"
+    ".irssi"
     ".git-prompt.sh"
   )
 
@@ -336,18 +338,6 @@ remove_stale_symlinks() {
       fi
     fi
   done
-}
-
-remove_legacy_irssi() {
-  local target="${HOME}/.irssi"
-  if [ -L "${target}" ]; then
-    local resolved
-    resolved="$(readlink -f "${target}" 2>/dev/null || readlink "${target}")"
-    if [[ "$resolved" == "${STOW_DIR}/linux/.irssi"* ]] || [[ "$resolved" == *my-dot-files* ]]; then
-      log "Removing legacy .irssi symlink -> ${resolved}"
-      rm -f "${target}"
-    fi
-  fi
 }
 
 stow_packages() {
@@ -391,7 +381,6 @@ main() {
   install_node_tools
   install_python_vim_deps
   remove_stale_symlinks
-  remove_legacy_irssi
   backup_conflicts
   stow_packages common linux
   install_vundle
