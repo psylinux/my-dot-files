@@ -56,7 +56,7 @@ call vundle#begin()
   Plugin 'benmills/vimux'
   Plugin 'jeetsukumaran/vim-buffergator'
   Plugin 'gilsondev/searchtasks.vim'
-  " neocomplete removed
+" neocomplete removed
   Plugin 'tpope/vim-dispatch'
   Plugin 'jceb/vim-orgmode'
   Plugin 'tpope/vim-speeddating'
@@ -329,6 +329,15 @@ nnoremap <leader>. :CtrlPTag<cr>
 map <C-m> :TagbarToggle<CR>
 
 """" Neocomplete mappings removed
+
+"""" Omnifunc defaults (used by built-in <C-x><C-o>)
+if exists('+omnifunc')
+  autocmd FileType css         setlocal omnifunc=csscomplete#CompleteCSS
+  autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+  autocmd FileType javascript  setlocal omnifunc=javascriptcomplete#CompleteJS
+  autocmd FileType python      setlocal omnifunc=pythoncomplete#Complete
+  autocmd FileType xml         setlocal omnifunc=xmlcomplete#CompleteTags
+endif
 
 " Mapping selecting Mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
