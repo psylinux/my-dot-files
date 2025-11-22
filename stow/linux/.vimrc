@@ -283,7 +283,19 @@ augroup END
 let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 
 " Settings for Writting
-let g:languagetool_jar = '/opt/languagetool/languagetool-commandline.jar'
+" Try to locate LanguageTool; fall back to common install paths.
+if !exists('g:languagetool_jar') || empty(g:languagetool_jar)
+  for candidate in [
+        \ '/opt/languagetool/languagetool-commandline.jar',
+        \ '/usr/share/languagetool/LanguageTool.jar',
+        \ '/usr/share/java/languagetool.jar',
+        \ '/usr/share/java/languagetool-standalone.jar']
+    if filereadable(expand(candidate))
+      let g:languagetool_jar = candidate
+      break
+    endif
+  endfor
+endif
 
 " Vim-pencil Configuration
 "let g:pencil#wrapModeDefault = 'soft'   " default is 'hard'
