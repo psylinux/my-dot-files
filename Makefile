@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-SCRIPTS := install.sh scripts/bootstrap-linux.sh scripts/bootstrap-mac.sh scripts/linux/vim-setup.sh
+SCRIPTS := install.sh scripts/bootstrap-linux.sh scripts/bootstrap-mac.sh
 
 .PHONY: lint check stow-linux stow-mac bootstrap-linux bootstrap-mac
 

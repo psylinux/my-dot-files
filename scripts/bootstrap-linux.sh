@@ -133,6 +133,25 @@ install_vundle() {
   vim +PluginInstall +qall
 }
 
+setup_markdown_preview_yarn() {
+  local plugin_app="${HOME}/.vim/bundle/markdown-preview.nvim/app"
+  local yarn_ver="${MP_YARN_VERSION:-1.22.4}"
+
+  if [ ! -d "${plugin_app}" ]; then
+    log "Skipping markdown-preview.nvim yarn setup (plugin app dir missing)"
+    return
+  fi
+  if ! command -v asdf >/dev/null 2>&1; then
+    log "Skipping markdown-preview.nvim yarn setup (asdf not installed)"
+    return
+  fi
+
+  asdf plugin-add yarn >/dev/null 2>&1 || true
+  asdf install yarn "${yarn_ver}" >/dev/null 2>&1 || true
+  (cd "${plugin_app}" && asdf local yarn "${yarn_ver}" && yarn install) || \
+    log "Warning: yarn install for markdown-preview.nvim failed"
+}
+
 install_gef() {
   log "Installing GEF for GDB"
   sudo rm -rf /opt/gef
@@ -386,6 +405,7 @@ main() {
   backup_conflicts
   stow_packages common linux
   install_vundle
+  setup_markdown_preview_yarn
   install_gef
   install_vim_tools_apt
   install_tmux_plugins
