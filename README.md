@@ -25,6 +25,8 @@ stow -d stow -t ~ -D linux
 Notes:
 - Ensure `~/.local/bin` is on `PATH` (the Linux `.bashrc` does this).
 - Run stow from the repo root; add/swap packages as needed.
+- Linux shell startup will initialize `pyenv` when present and only run `pyenv virtualenv-init` if the plugin is installed.
+- Shell sessions are recorded to `~/logs/<date>_shell.log`; remove that block in `stow/linux/.bashrc` if you prefer not to log.
 
 ## One-shot install
 ```sh
