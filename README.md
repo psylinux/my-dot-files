@@ -4,7 +4,7 @@ Dotfiles for Linux and macOS managed with GNU Stow.
 
 ## Layout
 - `stow/common`: shared settings (currently empty placeholder for cross-platform files).
-- `stow/linux`: Linux shell/editor/git/tmux configs plus helper scripts in `.local/bin`.
+- `stow/linux`: Linux shell/editor/git/tmux configs, `.ssh/config`, plus helper scripts in `.local/bin`.
 - `stow/mac`: macOS zsh/tmux/git configs and GPG agent files.
 - `scripts/linux`: one-off setup helpers (`vim-setup.sh`) run manually.
 - `scripts/bootstrap-*.sh`: platform-specific bootstrap entrypoints called by `install.sh`.
