@@ -96,8 +96,9 @@ ensure_pyenv() {
   PYENV_PIP="$(pyenv which pip)"
   "$PYENV_PIP" install --upgrade pip
 
-  if ! grep -Fq 'pyenv init' "${HOME}/.bashrc"; then
+  if ! grep -Fq 'pyenv init' "${HOME}/.bashrc" 2>/dev/null; then
     log "Appending pyenv init block to ~/.bashrc"
+    touch "${HOME}/.bashrc"
     cat >> "${HOME}/.bashrc" <<'EOF'
 # pyenv setup
 export PYENV_ROOT="$HOME/.pyenv"
