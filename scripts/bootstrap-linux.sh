@@ -39,8 +39,17 @@ install_packages_apt() {
     python3 python3-pip python3-venv python3-dev
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev
     libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
-    fzf ripgrep silversearcher-ag default-jre-headless nodejs npm languagetool
+    fzf ripgrep silversearcher-ag default-jre-headless nodejs npm
   )
+  local optional_packages=(languagetool)
+
+  for pkg in "${optional_packages[@]}"; do
+    if apt-cache show "$pkg" >/dev/null 2>&1; then
+      packages_common+=("$pkg")
+    else
+      log "Optional package '$pkg' not available in apt; skipping."
+    fi
+  done
 
   log "Installing base packages (${#packages_common[@]})"
   sudo apt-get install -y "${packages_common[@]}"
