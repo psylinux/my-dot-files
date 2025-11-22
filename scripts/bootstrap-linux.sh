@@ -6,6 +6,7 @@ STOW_DIR="${ROOT_DIR}/stow"
 PYENV_VERSION="${PYENV_VERSION:-3.12.7}"
 PYENV_ROOT="${HOME}/.pyenv"
 PYENV_PIP=""
+NERD_FONTS_VERSION="${NERD_FONTS_VERSION:-3.2.1}"
 
 log() { printf '[dotfiles] %s\n' "$*"; }
 die() { log "$*"; exit 1; }
@@ -40,6 +41,7 @@ install_packages_apt() {
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev
     libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
     fzf ripgrep silversearcher-ag default-jre-headless nodejs npm
+    unzip fontconfig
   )
   local optional_packages=(languagetool)
 
@@ -216,6 +218,32 @@ install_tmux_plugins() {
   log "Reload tmux (prefix + r) and press prefix + I inside tmux to fetch plugins."
 }
 
+install_nerd_font_symbols() {
+  local font_dir="${HOME}/.local/share/fonts/nerd-fonts-symbols"
+  local font_file="${font_dir}/NerdFontsSymbolsOnly-Regular.ttf"
+  if [ -f "${font_file}" ]; then
+    log "Nerd Font symbols already present"
+    return
+  fi
+
+  mkdir -p "${font_dir}"
+  local zip_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${NERD_FONTS_VERSION}/NerdFontsSymbolsOnly.zip"
+  local tmp_zip
+  tmp_zip="$(mktemp)"
+
+  log "Downloading Nerd Font symbols (v${NERD_FONTS_VERSION})"
+  if ! curl -fsSL "${zip_url}" -o "${tmp_zip}"; then
+    log "Warning: failed to download Nerd Font symbols from ${zip_url}"
+    rm -f "${tmp_zip}"
+    return
+  fi
+
+  log "Installing Nerd Font symbols to ${font_dir}"
+  unzip -oq "${tmp_zip}" -d "${font_dir}"
+  rm -f "${tmp_zip}"
+  fc-cache -f "${font_dir}" || log "Warning: fc-cache failed; fonts may require relogin"
+}
+
 ensure_logs_cron() {
   local cron_cmd_archive="find ${HOME}/logs -maxdepth 1 -type f -name '*.log' -mtime +30 -print0 | tar -czf ${HOME}/logs/archive-last-30days.tar.gz --null -T -"
   local cron_line_archive="0 11 * * * ${cron_cmd_archive}"
@@ -345,6 +373,7 @@ main() {
   install_gef
   install_vim_tools_apt
   install_tmux_plugins
+  install_nerd_font_symbols
   ensure_logs_cron
   log "Done. Restart your shell to pick up any PATH changes."
 }
