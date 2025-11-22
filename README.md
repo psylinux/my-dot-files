@@ -41,6 +41,7 @@ cd ~/my-dot-files
 ### What the Linux bootstrap installs
 - Core tools: git, curl, stow, tmux, vim, irssi/bitlbee, build-essential toolchain, ctags, MinGW cross-compilers.
 - Vim helpers: fzf, ripgrep, silversearcher-ag, python3 toolchain, LanguageTool + Java runtime, nodejs/npm/yarn (for markdown-preview), and Python packages `pynvim` + `jedi`.
+- Fonts: Nerd Font symbols (downloaded from nerd-fonts releases) plus fontconfig cache refresh for proper Airline/devicons glyphs.
 - pyenv with Python `${PYENV_VERSION}` for plugin support.
 - Vundle plugins, tmux plugins, and optional cron for log rotation.
 
