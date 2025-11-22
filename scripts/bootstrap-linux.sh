@@ -341,7 +341,21 @@ remove_stale_symlinks() {
 }
 
 stow_packages() {
-  local packages=("$@")
+  local requested=("$@")
+  local packages=()
+  for pkg in "${requested[@]}"; do
+    if [ -d "${STOW_DIR}/${pkg}" ]; then
+      packages+=("$pkg")
+    else
+      log "Skipping missing stow package '${pkg}'"
+    fi
+  done
+
+  if [ "${#packages[@]}" -eq 0 ]; then
+    log "No stow packages to apply; skipping stow step."
+    return
+  fi
+
   mkdir -p "$HOME/.local/bin"
   log "Stowing packages: ${packages[*]}"
   stow -d "$STOW_DIR" -t "$HOME" -R "${packages[@]}"
