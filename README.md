@@ -45,7 +45,7 @@ cd ~/my-dot-files
 - Fonts: Nerd Font symbols (downloaded from nerd-fonts releases) plus fontconfig cache refresh for proper Airline/devicons glyphs.
 - pyenv with Python `${PYENV_VERSION}` for plugin support.
 - Vundle plugins, tmux plugins, and optional cron for log rotation.
-- If `asdf` is installed and `markdown-preview.nvim` is present, bootstrap sets a local yarn (`1.22.4` by default) inside the plugin to satisfy its build.
+- If `markdown-preview.nvim` is present, bootstrap installs its JS deps (prefers `asdf`/yarn when available, falls back to npm).
 
 ## Helpful commands
 - `make lint`: run `shellcheck` if available against key scripts.
