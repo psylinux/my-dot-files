@@ -20,10 +20,9 @@ set encoding=UTF-8
 " the plugins.
 let mapleader=","
 
-" Enable Elite mode
-let g:elite_mode=1
-" neocomplete is incompatible with Vim 8.2.1066+; keep a flag to avoid loading it there.
-let g:use_neocomplete = !has('patch-8.2.1066')
+" Enable Elite mode (set to 1 to remap arrows to resize splits)
+let g:elite_mode=0
+let g:use_neocomplete = 0
 
 
 " ----------------------------------------------------
@@ -57,9 +56,7 @@ call vundle#begin()
   Plugin 'benmills/vimux'
   Plugin 'jeetsukumaran/vim-buffergator'
   Plugin 'gilsondev/searchtasks.vim'
-  if g:use_neocomplete
-    Plugin 'Shougo/neocomplete.vim'
-  endif
+  " neocomplete removed
   Plugin 'tpope/vim-dispatch'
   Plugin 'jceb/vim-orgmode'
   Plugin 'tpope/vim-speeddating'
@@ -134,10 +131,9 @@ call vundle#begin()
 
   """" Neosnippet Plugins
   Plugin 'Shougo/deoplete.nvim'
-  if !has('nvim')
-    Plugin 'roxma/nvim-yarp'
-    Plugin 'roxma/vim-hug-neovim-rpc'
-  endif
+  " If using Vim (not Neovim), uncomment to enable deoplete compatibility shims:
+  " Plugin 'roxma/nvim-yarp'
+  " Plugin 'roxma/vim-hug-neovim-rpc'
   Plugin 'Shougo/neosnippet.vim'
   Plugin 'Shougo/neosnippet-snippets'
 
@@ -230,54 +226,7 @@ let g:syntastic_check_on_open = 1
 " Neomake settings
 autocmd! BufWritePost * Neomake
 
-"""" Neocomplete Settings (skip on Vim 8.2.1066+)
-if g:use_neocomplete
-  let g:acp_enableAtStartup = 0
-  let g:neocomplete#enable_at_startup = 1
-  let g:neocomplete#enable_smart_case = 1
-  let g:neocomplete#sources#syntax#min_keyword_length = 3
-
-  " [Neocomplete] Define dictionary
-  let g:neocomplete#sources#dictionary#dictionaries = {
-      \ 'default' : '',
-      \ 'vimshell' : $HOME.'/.vimshell_hist',
-      \ 'scheme' : $HOME.'/.gosh_completions'
-      \ }
-
-  " [Neocomplete] Define keyword
-  if !exists('g:neocomplete#keyword_patterns')
-      let g:neocomplete#keyword_patterns = {}
-  endif
-  let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-  " [Neocomplete] Recommended key-mappings.
-  " <CR>: close popup and save indent.
-  inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-  function! s:my_cr_function()
-    return (pumvisible() ? "\<C-y>" : "" ) . "\<CR>"
-    " For no inserting <CR> key.
-    "return pumvisible() ? "\<C-y>" : "\<CR>"
-  endfunction
-
-  " [Neocomplete] Enable omni completion.
-  autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-  autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-  autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-  autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-  autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-  " [Neocomplete] Enable heavy omni completion.
-  if !exists('g:neocomplete#sources#omni#input_patterns')
-    let g:neocomplete#sources#omni#input_patterns = {}
-  endif
-  let g:neocomplete#sources#omni#input_patterns.php = '[^. \t]->\h\w*\|\h\w*::'
-  let g:neocomplete#sources#omni#input_patterns.c = '[^.[:digit:] *\t]\%(\.\|->\)'
-  let g:neocomplete#sources#omni#input_patterns.cpp = '[^.[:digit:] *\t]\%(\.\|->\)\|\h\w*::'
-
-  " [Neocomplete] For perlomni.vim setting.
-  " https://github.com/c9s/perlomni.vim
-  let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
-endif
+"""" Neocomplete Settings removed
 
 """" Markdown Syntax Support
 augroup markdown
@@ -379,22 +328,7 @@ map <C-n> :NERDTreeToggle<CR>
 nnoremap <leader>. :CtrlPTag<cr>
 map <C-m> :TagbarToggle<CR>
 
-if g:use_neocomplete
-  " [Neocomplete] Omnicomplete Better Nav
-  inoremap <expr> <c-j> ("\<C-n>")
-  inoremap <expr> <c-k> ("\<C-p>")
-
-  " [Neocomplete] Plugin mappings
-  inoremap <expr><C-g>     neocomplete#undo_completion()
-  inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-  " [Neocomplete] <TAB>: completion
-  inoremap <expr> <tab> pumvisible() ? "\<C-n>" : "\<tab>"
-
-  " [Neocomplete] <C-h>, <BS>: close popup and delete backword char.
-  inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-  inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-endif
+"""" Neocomplete mappings removed
 
 " Mapping selecting Mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
