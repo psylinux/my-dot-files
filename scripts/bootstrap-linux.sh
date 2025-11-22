@@ -1,0 +1,275 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+STOW_DIR="${ROOT_DIR}/stow"
+PYENV_VERSION="${PYENV_VERSION:-3.12.7}"
+PYENV_ROOT="${HOME}/.pyenv"
+PYENV_PIP=""
+
+log() { printf '[dotfiles] %s\n' "$*"; }
+die() { log "$*"; exit 1; }
+
+apt_update() {
+  log "Updating apt cache"
+  sudo apt-get update -y
+}
+
+ensure_stow() {
+  if command -v stow >/dev/null 2>&1; then
+    return
+  fi
+
+  log "GNU Stow not found, attempting install..."
+  if command -v apt-get >/dev/null 2>&1; then
+    sudo apt-get install -y stow || die "Failed to install stow via apt-get."
+  elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y stow || die "Failed to install stow via dnf."
+  elif command -v pacman >/dev/null 2>&1; then
+    sudo pacman --noconfirm -S stow || die "Failed to install stow via pacman."
+  else
+    die "Package manager not detected. Install stow manually."
+  fi
+}
+
+install_packages_apt() {
+  local packages_common=(
+    git curl ca-certificates build-essential pkg-config
+    stow tmux vim irssi bitlbee bitlbee-plugin-otr libnotify-bin
+    python3 python3-pip python3-venv python3-dev
+    libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev
+    libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
+  )
+
+  log "Installing base packages (${#packages_common[@]})"
+  sudo apt-get install -y "${packages_common[@]}"
+}
+
+install_ctags_apt() {
+  if apt-cache show universal-ctags >/dev/null 2>&1; then
+    sudo apt-get install -y universal-ctags
+  elif apt-cache show exuberant-ctags >/dev/null 2>&1; then
+    sudo apt-get install -y exuberant-ctags
+  else
+    log "ctags package not found; skipping (install manually if needed)."
+  fi
+}
+
+install_mingw_apt() {
+  local mingw_packages=(mingw-w64 gcc-mingw-w64 g++-mingw-w64 binutils-mingw-w64 clang llvm)
+  log "Installing MinGW cross-compilers (${#mingw_packages[@]})"
+  sudo apt-get install -y "${mingw_packages[@]}"
+}
+
+ensure_pyenv() {
+  if [ ! -d "$PYENV_ROOT" ]; then
+    log "Installing pyenv to ${PYENV_ROOT}"
+    git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"
+  else
+    log "pyenv already present at ${PYENV_ROOT}"
+  fi
+
+  export PYENV_ROOT
+  export PATH="${PYENV_ROOT}/bin:${PATH}"
+  command -v pyenv >/dev/null 2>&1 || die "pyenv not on PATH after install."
+  eval "$(pyenv init -)"
+
+  if ! pyenv versions --bare | grep -Fx "$PYENV_VERSION" >/dev/null 2>&1; then
+    log "Installing Python ${PYENV_VERSION} via pyenv"
+    pyenv install "$PYENV_VERSION"
+  else
+    log "Python ${PYENV_VERSION} already installed in pyenv"
+  fi
+
+  pyenv global "$PYENV_VERSION"
+  pyenv rehash
+  PYENV_PIP="$(pyenv which pip)"
+  "$PYENV_PIP" install --upgrade pip
+
+  if ! grep -Fq 'pyenv init' "${HOME}/.bashrc"; then
+    log "Appending pyenv init block to ~/.bashrc"
+    cat >> "${HOME}/.bashrc" <<'EOF'
+# pyenv setup
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+EOF
+  fi
+}
+
+install_vundle() {
+  local vundle_dir="${HOME}/.vim/bundle/Vundle.vim"
+  if [ -d "$vundle_dir/.git" ]; then
+    log "Updating Vundle"
+    git -C "$vundle_dir" pull --quiet
+  else
+    log "Installing Vundle"
+    git clone https://github.com/VundleVim/Vundle.vim.git "$vundle_dir"
+  fi
+
+  log "Installing Vim plugins via Vundle"
+  vim +PluginInstall +qall
+}
+
+install_gef() {
+  log "Installing GEF for GDB"
+  sudo rm -rf /opt/gef
+  sudo git clone https://github.com/hugsy/gef.git /opt/gef
+  if [ -z "$PYENV_PIP" ]; then
+    die "pyenv pip not detected; ensure_pyenv did not run?"
+  fi
+  "$PYENV_PIP" install --upgrade keystone-engine unicorn ropper capstone
+
+  local gdb_py
+  gdb_py="$(gdb -q -nx -ex "python import sys; print(sys.executable)" -ex quit 2>/dev/null | tail -n 1 || true)"
+  if [ -z "$gdb_py" ] || [ ! -x "$gdb_py" ]; then
+    log "Could not detect gdb's Python; falling back to python3 for GEF deps."
+    gdb_py="$(command -v python3 || true)"
+  fi
+  if [ -n "$gdb_py" ] && [ -x "$gdb_py" ]; then
+    "$gdb_py" -m pip install --break-system-packages --user --upgrade keystone-engine unicorn ropper capstone rpyc requests pygments retdec-python filebytes || \
+      log "Warning: installing GEF deps for gdb python failed; check pip/PEP668 output."
+  else
+    log "Warning: no Python interpreter found for gdb; GEF extras may miss deps."
+  fi
+
+  local pyenv_site="${PYENV_ROOT}/versions/${PYENV_VERSION}/lib/python${PYENV_VERSION%.*}/site-packages"
+  cat > "${HOME}/.gdbinit" <<EOF
+python
+import sys, os
+site_dir = os.path.expanduser("${pyenv_site}")
+if os.path.isdir(site_dir) and site_dir not in sys.path:
+    sys.path.insert(0, site_dir)
+end
+source /opt/gef/gef.py
+EOF
+
+  if [ -d "${HOME}/.gef-extras" ]; then
+    rm -rf "${HOME}/.gef-extras"
+  fi
+  /opt/gef/scripts/gef-extras.sh || log "Warning: gef-extras install hit an error."
+}
+
+install_vim_tools_apt() {
+  log "Installing VIM tools (vim-python-jedi)"
+  sudo apt-get install -y vim-python-jedi || log "vim-python-jedi not available; skipping."
+}
+
+install_tmux_plugins() {
+  log "Installing tmux plugins (tpm and vim-tmux-focus-events)"
+  mkdir -p "${HOME}/.tmux/plugins"
+  if [ ! -d "${HOME}/.tmux/plugins/tpm/.git" ]; then
+    git clone https://github.com/tmux-plugins/tpm "${HOME}/.tmux/plugins/tpm"
+  else
+    git -C "${HOME}/.tmux/plugins/tpm" pull --quiet
+  fi
+  if [ ! -d "${HOME}/.tmux/plugins/vim-tmux-focus-events/.git" ]; then
+    git clone https://github.com/tmux-plugins/vim-tmux-focus-events "${HOME}/.tmux/plugins/vim-tmux-focus-events"
+  else
+    git -C "${HOME}/.tmux/plugins/vim-tmux-focus-events" pull --quiet
+  fi
+  log "Reload tmux (prefix + r) and press prefix + I inside tmux to fetch plugins."
+}
+
+ensure_logs_cron() {
+  local cron_cmd_archive="find ${HOME}/logs -maxdepth 1 -type f -name '*.log' -mtime +30 -print0 | tar -czf ${HOME}/logs/archive-last-30days.tar.gz --null -T -"
+  local cron_line_archive="0 11 * * * ${cron_cmd_archive}"
+
+  local cron_cmd_delete="find ${HOME}/logs -maxdepth 1 -type f -name '*.log' -mtime +30 -delete"
+  local cron_line_delete="10 11 * * * ${cron_cmd_delete}"
+
+  local tmp_cron
+  tmp_cron="$(mktemp)"
+  crontab -l 2>/dev/null > "${tmp_cron}" || true
+
+  local updated=false
+
+  if ! grep -Fq "${cron_line_archive}" "${tmp_cron}"; then
+    printf '%s\n' "${cron_line_archive}" >> "${tmp_cron}"
+    updated=true
+  fi
+
+  if ! grep -Fq "${cron_line_delete}" "${tmp_cron}"; then
+    printf '%s\n' "${cron_line_delete}" >> "${tmp_cron}"
+    updated=true
+  fi
+
+  if [ "${updated}" = true ]; then
+    crontab "${tmp_cron}"
+    log "Installed cron to archive and delete ~/logs files older than 30 days (archive at 11:00, delete at 11:10)."
+  else
+    log "Cron for archiving and deleting ~/logs already present."
+  fi
+
+  rm -f "${tmp_cron}"
+}
+
+backup_conflicts() {
+  local backup_dir="${HOME}/.dotfiles-backup-$(date +%Y%m%d%H%M%S)"
+  local paths=(
+    ".bashrc"
+    ".gitconfig"
+    ".gitignore"
+    ".tmux.conf"
+    ".vimrc"
+    ".vim"
+    ".irssi"
+    ".git-prompt.sh"
+  )
+
+  local any=0
+  for p in "${paths[@]}"; do
+    local target="${HOME}/${p}"
+    if [ -L "$target" ]; then
+      log "Removing existing symlink ${p}"
+      rm -f "$target"
+      any=1
+    elif [ -e "$target" ]; then
+      log "Backing up ${p} to ${backup_dir}/${p}"
+      mkdir -p "${backup_dir}/$(dirname "$p")"
+      mv "$target" "${backup_dir}/${p}"
+      any=1
+    fi
+  done
+
+  if [ "$any" -eq 1 ]; then
+    log "Backups stored in ${backup_dir}"
+  fi
+}
+
+stow_packages() {
+  local packages=("$@")
+  mkdir -p "$HOME/.local/bin"
+  log "Stowing packages: ${packages[*]}"
+  stow -d "$STOW_DIR" -t "$HOME" -R "${packages[@]}"
+
+  if [ -f "${STOW_DIR}/common/.gitignore" ]; then
+    cp "${STOW_DIR}/common/.gitignore" "${HOME}/.gitignore"
+    git config --global core.excludesfile "${HOME}/.gitignore" || log "Warning: failed to set global git excludesfile"
+  fi
+}
+
+main() {
+  if ! command -v apt-get >/dev/null 2>&1; then
+    die "apt-get not found. This bootstrap script targets Debian/Ubuntu."
+  fi
+
+  ensure_stow
+  apt_update
+  install_packages_apt
+  install_ctags_apt
+  install_mingw_apt
+  ensure_pyenv
+  backup_conflicts
+  stow_packages common linux
+  install_vundle
+  install_gef
+  install_vim_tools_apt
+  install_tmux_plugins
+  ensure_logs_cron
+  log "Done. Restart your shell to pick up any PATH changes."
+}
+
+main "$@"
