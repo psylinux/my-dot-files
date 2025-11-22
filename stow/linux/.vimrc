@@ -344,6 +344,41 @@ if exists('+omnifunc')
   autocmd FileType * if empty(&omnifunc) | setlocal omnifunc=syntaxcomplete#Complete | endif
 endif
 
+"""" ALE eslint: only run when a config is present
+function! s:has_eslint_config() abort
+  let l:files = ['.eslintrc', '.eslintrc.json', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.yml', '.eslintrc.yaml']
+  for l:f in l:files
+    if !empty(findfile(l:f, '.;'))
+      return 1
+    endif
+  endfor
+  let l:pkg = findfile('package.json', '.;')
+  if !empty(l:pkg)
+    try
+      if join(readfile(l:pkg), "\n") =~ '"eslintConfig"\s*:'
+        return 1
+      endif
+    catch
+    endtry
+  endif
+  return 0
+endfunction
+
+function! s:maybe_enable_eslint() abort
+  if exists('*ale#SetBufferLinters')
+    if s:has_eslint_config()
+      call ale#SetBufferLinters(['eslint'])
+    else
+      call ale#SetBufferLinters([])
+    endif
+  endif
+endfunction
+
+augroup eslint_config_check
+  autocmd!
+  autocmd FileType javascript,typescript call s:maybe_enable_eslint()
+augroup END
+
 " Mapping selecting Mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
 xmap <leader><tab> <plug>(fzf-maps-x)
