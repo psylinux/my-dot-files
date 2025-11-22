@@ -168,10 +168,14 @@ fi
 alias getclip="xclip -selection c -o"                        # Paste from Clipboard
 alias setclip="xclip -selection c && xclip -selection c -o"  # Copy to Clipboard
 
-# PyEnv Exports
-export PATH="~/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
-eval "$(pyenv virtualenv-init -)"
+# PyEnv Exports (guard virtualenv-init because the plugin is optional)
+export PATH="$HOME/.pyenv/bin:$PATH"
+if command -v pyenv >/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+  if pyenv commands | grep -Fqx virtualenv-init 2>/dev/null; then
+    eval "$(pyenv virtualenv-init -)"
+  fi
+fi
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
 
 # SSH Agent Exports
@@ -187,8 +191,9 @@ fi
 # Customized PATH
 export PATH="$HOME/.local/bin:$HOME/go/bin:/usr/sbin:/usr/local/sbin:$PATH"
 
-# Recording the session
-test "$(ps -ocommand= -p $PPID | awk '{print $1}')" == 'script' || (script -f $HOME/logs/$(date +"%d-%b-%y_%H-%M-%S")_shell.log)
+# Recording the session (ensure log directory exists before using script)
+mkdir -p "$HOME/logs"
+test "$(ps -ocommand= -p $PPID | awk '{print $1}')" == 'script' || (script -f "$HOME/logs/$(date +"%d-%b-%y_%H-%M-%S")_shell.log")
 echo -e "===================================================================================="
 echo -e "*****************************  Recording this session  *****************************"
 echo -e "===================================================================================="
