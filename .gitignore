@@ -156,4 +156,4 @@ scripts/linux/LanguageTool-*/
 /opt/nerd-fonts/
 logs/
 .DS_Store
-
+stow/linux/.irssi/otr/otr.instag
