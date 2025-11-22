@@ -72,6 +72,12 @@ install_mingw_apt() {
 }
 
 ensure_pyenv() {
+  # Remove broken ~/.bashrc symlink before touching it later.
+  if [ -L "${HOME}/.bashrc" ] && [ ! -e "${HOME}/.bashrc" ]; then
+    log "Removing broken ~/.bashrc symlink"
+    rm -f "${HOME}/.bashrc"
+  fi
+
   if [ ! -d "$PYENV_ROOT" ]; then
     log "Installing pyenv to ${PYENV_ROOT}"
     git clone https://github.com/pyenv/pyenv.git "$PYENV_ROOT"
@@ -324,6 +330,7 @@ main() {
   fi
 
   ensure_stow
+  remove_stale_symlinks
   apt_update
   install_packages_apt
   install_ctags_apt
