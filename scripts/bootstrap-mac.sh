@@ -26,8 +26,8 @@ stow_packages() {
   log "Stowing packages: ${packages[*]}"
   stow -d "$STOW_DIR" -t "$HOME" -R "${packages[@]}"
 
-  if [ -f "${STOW_DIR}/common/.gitignore" ]; then
-    cp "${STOW_DIR}/common/.gitignore" "${HOME}/.gitignore"
+  if [ -f "${ROOT_DIR}/.gitignore" ]; then
+    cp "${ROOT_DIR}/.gitignore" "${HOME}/.gitignore"
     git config --global core.excludesfile "${HOME}/.gitignore" || log "Warning: failed to set global git excludesfile"
   fi
 }
