@@ -52,7 +52,6 @@ call vundle#begin()
   Plugin 'SirVer/ultisnips'
   Plugin 'junegunn/fzf.vim'
   Plugin 'junegunn/fzf'
-  Plugin 'ctrlpvim/ctrlp.vim'
   Plugin 'benmills/vimux'
   Plugin 'jeetsukumaran/vim-buffergator'
   Plugin 'gilsondev/searchtasks.vim'
@@ -66,8 +65,6 @@ call vundle#begin()
   Plugin 'tpope/vim-endwise'
   Plugin 'universal-ctags/ctags'
   Plugin 'honza/vim-snippets'
-  Plugin 'neomake/neomake'
-  Plugin 'vim-syntastic/syntastic'
   Plugin 'ncm2/ncm2'                      "awesome autocomplete plugin
   Plugin 'ncm2/ncm2-bufword'              "buffer keyword completion
   Plugin 'ncm2/ncm2-path'                 "filepath completion
@@ -98,7 +95,6 @@ call vundle#begin()
   Plugin 'mattn/gist-vim'
   Plugin 'mattn/webapi-vim'
   Plugin 'airblade/vim-gitgutter'         "show git changes to files in gutter
-  Plugin 'mhinz/vim-signify'              "show git file changes in the gutter
   "Plugin 'jaxbot/github-issues.vim'
 
   " Theme / Interface
@@ -129,13 +125,7 @@ call vundle#begin()
   Plugin 'tiagofumo/vim-nerdtree-syntax-highlight'
   Plugin 'scrooloose/nerdtree'
 
-  """" Neosnippet Plugins
-  Plugin 'Shougo/deoplete.nvim'
-  " If using Vim (not Neovim), uncomment to enable deoplete compatibility shims:
-  " Plugin 'roxma/nvim-yarp'
-  " Plugin 'roxma/vim-hug-neovim-rpc'
-  Plugin 'Shougo/neosnippet.vim'
-  Plugin 'Shougo/neosnippet-snippets'
+  """" Completion/snippets (ncm2 + UltiSnips)
 
 call vundle#end()               "required
 
