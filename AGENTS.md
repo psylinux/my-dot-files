@@ -6,7 +6,7 @@ This repo centralizes personal dotfiles and helper scripts for Linux and macOS. 
 - `stow/common` is for shared assets across platforms (currently `.gitignore`).
 - `stow/linux` is the Stow package for Linux (`.bashrc`, `.vimrc`, `.tmux.conf`, `.gitconfig`, `.git-prompt.sh`, `.irssi`, `.vim/colors`, `.local/bin` helpers).
 - `stow/mac` is the macOS package (`.zshrc`, `.p10k.zsh`, `.tmux.conf`, `.gitconfig`, `.gnupg/gpg-agent.conf`, `.gnupg/sshcontrol`).
-- `scripts/linux` keeps one-off setup helpers (e.g., `vim-setup.zsh`).
+- `scripts/linux` keeps one-off setup helpers.
 - `.ssh/` is tracked here but keep private material out of version control.
 
 ## Build, Test, and Development Commands
