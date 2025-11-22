@@ -335,7 +335,11 @@ if exists('+omnifunc')
   autocmd FileType css         setlocal omnifunc=csscomplete#CompleteCSS
   autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
   autocmd FileType javascript  setlocal omnifunc=javascriptcomplete#CompleteJS
-  autocmd FileType python      setlocal omnifunc=pythoncomplete#Complete
+  if has('python3')
+    autocmd FileType python    setlocal omnifunc=python3complete#Complete
+  elseif has('python')
+    autocmd FileType python    setlocal omnifunc=pythoncomplete#Complete
+  endif
   autocmd FileType xml         setlocal omnifunc=xmlcomplete#CompleteTags
 endif
 
