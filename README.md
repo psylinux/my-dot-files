@@ -6,7 +6,7 @@ Dotfiles for Linux and macOS managed with GNU Stow.
 - `stow/common`: shared settings (currently empty placeholder for cross-platform files).
 - `stow/linux`: Linux shell/editor/git/tmux configs, `.ssh/config`, plus helper scripts in `.local/bin`.
 - `stow/mac`: macOS zsh/tmux/git configs and GPG agent files.
-- `scripts/linux`: one-off setup helpers (`vim-setup.sh`) run manually.
+- `scripts/linux`: one-off setup helpers (none currently).
 - `scripts/bootstrap-*.sh`: platform-specific bootstrap entrypoints called by `install.sh`.
 - `Makefile`: shortcuts for linting, dry-run stow, and bootstrapping.
 
@@ -45,6 +45,7 @@ cd ~/my-dot-files
 - Fonts: Nerd Font symbols (downloaded from nerd-fonts releases) plus fontconfig cache refresh for proper Airline/devicons glyphs.
 - pyenv with Python `${PYENV_VERSION}` for plugin support.
 - Vundle plugins, tmux plugins, and optional cron for log rotation.
+- If `asdf` is installed and `markdown-preview.nvim` is present, bootstrap sets a local yarn (`1.22.4` by default) inside the plugin to satisfy its build.
 
 ## Helpful commands
 - `make lint`: run `shellcheck` if available against key scripts.
