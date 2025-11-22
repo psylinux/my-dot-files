@@ -22,6 +22,8 @@ let mapleader=","
 
 " Enable Elite mode
 let g:elite_mode=1
+" neocomplete is incompatible with Vim 8.2.1066+; keep a flag to avoid loading it there.
+let g:use_neocomplete = !has('patch-8.2.1066')
 
 
 " ----------------------------------------------------
@@ -55,7 +57,9 @@ call vundle#begin()
   Plugin 'benmills/vimux'
   Plugin 'jeetsukumaran/vim-buffergator'
   Plugin 'gilsondev/searchtasks.vim'
-  Plugin 'Shougo/neocomplete.vim'
+  if g:use_neocomplete
+    Plugin 'Shougo/neocomplete.vim'
+  endif
   Plugin 'tpope/vim-dispatch'
   Plugin 'jceb/vim-orgmode'
   Plugin 'tpope/vim-speeddating'
@@ -226,7 +230,8 @@ let g:syntastic_check_on_open = 1
 " Neomake settings
 autocmd! BufWritePost * Neomake
 
-"""" Neocomplete Settings
+"""" Neocomplete Settings (skip on Vim 8.2.1066+)
+if g:use_neocomplete
   let g:acp_enableAtStartup = 0
   let g:neocomplete#enable_at_startup = 1
   let g:neocomplete#enable_smart_case = 1
@@ -272,6 +277,7 @@ autocmd! BufWritePost * Neomake
   " [Neocomplete] For perlomni.vim setting.
   " https://github.com/c9s/perlomni.vim
   let g:neocomplete#sources#omni#input_patterns.perl = '\h\w*->\h\w*\|\h\w*::'
+endif
 
 """" Markdown Syntax Support
 augroup markdown
@@ -373,20 +379,22 @@ map <C-n> :NERDTreeToggle<CR>
 nnoremap <leader>. :CtrlPTag<cr>
 map <C-m> :TagbarToggle<CR>
 
-" [Neocomplete] Omnicomplete Better Nav
-inoremap <expr> <c-j> ("\<C-n>")
-inoremap <expr> <c-k> ("\<C-p>")
+if g:use_neocomplete
+  " [Neocomplete] Omnicomplete Better Nav
+  inoremap <expr> <c-j> ("\<C-n>")
+  inoremap <expr> <c-k> ("\<C-p>")
 
-" [Neocomplete] Plugin mappings
-inoremap <expr><C-g>     neocomplete#undo_completion()
-inoremap <expr><C-l>     neocomplete#complete_common_string()
+  " [Neocomplete] Plugin mappings
+  inoremap <expr><C-g>     neocomplete#undo_completion()
+  inoremap <expr><C-l>     neocomplete#complete_common_string()
 
-" [Neocomplete] <TAB>: completion
-inoremap <expr> <tab> pumvisible() ? "\<C-n>" : "\<tab>"
+  " [Neocomplete] <TAB>: completion
+  inoremap <expr> <tab> pumvisible() ? "\<C-n>" : "\<tab>"
 
-" [Neocomplete] <C-h>, <BS>: close popup and delete backword char.
-inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+  " [Neocomplete] <C-h>, <BS>: close popup and delete backword char.
+  inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
+  inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
+endif
 
 " Mapping selecting Mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
