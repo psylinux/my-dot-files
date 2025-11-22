@@ -39,6 +39,7 @@ install_packages_apt() {
     python3 python3-pip python3-venv python3-dev
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev
     libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
+    fzf ripgrep silversearcher-ag default-jre-headless nodejs npm languagetool
   )
 
   log "Installing base packages (${#packages_common[@]})"
@@ -157,6 +158,31 @@ install_vim_tools_apt() {
   sudo apt-get install -y vim-python-jedi || log "vim-python-jedi not available; skipping."
 }
 
+install_node_tools() {
+  if command -v yarn >/dev/null 2>&1; then
+    log "yarn already installed"
+    return
+  fi
+
+  if command -v npm >/dev/null 2>&1; then
+    log "Installing yarn via npm (global)"
+    sudo npm install -g yarn || log "Warning: failed to install yarn globally via npm"
+  else
+    log "npm not available; skipping yarn install"
+  fi
+}
+
+install_python_vim_deps() {
+  local pip_cmd="${PYENV_PIP:-$(command -v pip3 || true)}"
+  if [ -z "$pip_cmd" ]; then
+    log "pip not found; skipping Python vim deps"
+    return
+  fi
+
+  log "Installing Python packages for Vim (pynvim, jedi)"
+  "$pip_cmd" install --upgrade --user pynvim jedi || log "Warning: failed to install pynvim/jedi"
+}
+
 install_tmux_plugins() {
   log "Installing tmux plugins (tpm and vim-tmux-focus-events)"
   mkdir -p "${HOME}/.tmux/plugins"
@@ -262,6 +288,8 @@ main() {
   install_ctags_apt
   install_mingw_apt
   ensure_pyenv
+  install_node_tools
+  install_python_vim_deps
   backup_conflicts
   stow_packages common linux
   install_vundle
