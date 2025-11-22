@@ -276,6 +276,36 @@ backup_conflicts() {
   fi
 }
 
+remove_stale_symlinks() {
+  local paths=(
+    ".bashrc"
+    ".gitconfig"
+    ".gitignore"
+    ".tmux.conf"
+    ".vimrc"
+    ".vim"
+    ".irssi"
+    ".git-prompt.sh"
+  )
+
+  # Add managed scripts under .local/bin
+  while IFS= read -r fname; do
+    paths+=(".local/bin/${fname}")
+  done < <(find "${STOW_DIR}/linux/.local/bin" -maxdepth 1 -type f -printf '%f\n' 2>/dev/null)
+
+  for p in "${paths[@]}"; do
+    local target="${HOME}/${p}"
+    if [ -L "$target" ]; then
+      local resolved
+      resolved="$(readlink -f "$target" 2>/dev/null || readlink "$target")"
+      if [[ "$resolved" != "${STOW_DIR}/"* ]]; then
+        log "Removing stale symlink ${p} -> ${resolved}"
+        rm -f "$target"
+      fi
+    fi
+  done
+}
+
 stow_packages() {
   local packages=("$@")
   mkdir -p "$HOME/.local/bin"
@@ -301,6 +331,7 @@ main() {
   ensure_pyenv
   install_node_tools
   install_python_vim_deps
+  remove_stale_symlinks
   backup_conflicts
   stow_packages common linux
   install_vundle
