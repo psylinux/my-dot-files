@@ -140,9 +140,8 @@ channels = (
   { name = "silc"; chatnet = "SILC"; autojoin = "No"; },
   {
     name = "#offsec";
-    chatnet = "FreeNode";
+    chatnet = "Libera";
     autojoin = "yes";
-    password = "REMOVED";
   }
 );
 
@@ -401,8 +400,7 @@ settings = {
   };
   "fe-text" = { actlist_sort = "refnum"; };
   "fe-common/core" = { theme = "xchat"; };
-  "perl/core/scripts" = {
-  };
+  "perl/core/scripts" = { awl_shared_sbar = "OFF"; };
 };
 hilights = ( { text = "psylinux"; nick = "no"; word = "yes"; } );
 windows = {
@@ -418,6 +416,25 @@ servers = (
     address = "irc.libera.chat";
     chatnet = "Libera";
     port = "6697";
+    password = "-tls";
+    use_tls = "no";
+    tls_verify = "yes";
+    autoconnect = "yes";
+  },
+  {
+    address = "irc.eu.libera.chat";
+    chatnet = "Libera";
+    port = "6697";
+    password = "-tls";
+    use_tls = "no";
+    tls_verify = "yes";
+    autoconnect = "yes";
+  },
+  {
+    address = "irc.us.libera.chat";
+    chatnet = "Libera";
+    port = "6697";
+    password = "-tls";
     use_tls = "no";
     tls_verify = "yes";
     autoconnect = "yes";
