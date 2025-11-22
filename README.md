@@ -38,6 +38,12 @@ cd ~/my-dot-files
 - Debian/Ubuntu: installs prerequisites (stow/vim/pyenv deps, ctags, mingw, irssi, etc.), backs up existing dotfiles, stows `common` + `linux`, installs Vundle/plugins, and sets up GEF.
 - Other Linux: stows `common` + `linux` (install extra build tools manually if needed).
 
+### What the Linux bootstrap installs
+- Core tools: git, curl, stow, tmux, vim, irssi/bitlbee, build-essential toolchain, ctags, MinGW cross-compilers.
+- Vim helpers: fzf, ripgrep, silversearcher-ag, python3 toolchain, LanguageTool + Java runtime, nodejs/npm/yarn (for markdown-preview), and Python packages `pynvim` + `jedi`.
+- pyenv with Python `${PYENV_VERSION}` for plugin support.
+- Vundle plugins, tmux plugins, and optional cron for log rotation.
+
 ## Helpful commands
 - `make lint`: run `shellcheck` if available against key scripts.
 - `make check`: syntax-check scripts with `bash -n`.
