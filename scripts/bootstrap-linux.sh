@@ -98,6 +98,7 @@ ensure_pyenv() {
 
   if ! grep -Fq 'pyenv init' "${HOME}/.bashrc" 2>/dev/null; then
     log "Appending pyenv init block to ~/.bashrc"
+    mkdir -p "$(dirname "${HOME}/.bashrc")"
     touch "${HOME}/.bashrc"
     cat >> "${HOME}/.bashrc" <<'EOF'
 # pyenv setup
