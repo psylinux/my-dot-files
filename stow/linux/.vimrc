@@ -348,11 +348,20 @@ endif
 function! s:has_eslint_config() abort
   let l:files = ['.eslintrc', '.eslintrc.json', '.eslintrc.js', '.eslintrc.cjs', '.eslintrc.yml', '.eslintrc.yaml']
   for l:f in l:files
-    if !empty(findfile(l:f, '.;'))
+    if exists('*ale#path#FindNearestFile')
+      let l:found = ale#path#FindNearestFile(bufnr(''), l:f)
+    else
+      let l:found = findfile(l:f, '.;')
+    endif
+    if !empty(l:found)
       return 1
     endif
   endfor
-  let l:pkg = findfile('package.json', '.;')
+  if exists('*ale#path#FindNearestFile')
+    let l:pkg = ale#path#FindNearestFile(bufnr(''), 'package.json')
+  else
+    let l:pkg = findfile('package.json', '.;')
+  endif
   if !empty(l:pkg)
     try
       if join(readfile(l:pkg), "\n") =~ '"eslintConfig"\s*:'
@@ -378,6 +387,10 @@ augroup eslint_config_check
   autocmd!
   autocmd FileType javascript,typescript call s:maybe_enable_eslint()
 augroup END
+
+" Use project-local eslint only; skip global when missing
+let g:ale_javascript_eslint_use_global = 0
+let g:ale_typescript_eslint_use_global = 0
 
 " Mapping selecting Mappings
 nmap <leader><tab> <plug>(fzf-maps-n)
