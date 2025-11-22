@@ -3,7 +3,7 @@
 Dotfiles for Linux and macOS managed with GNU Stow.
 
 ## Layout
-- `stow/common`: shared settings (global `.gitignore`).
+- `stow/common`: shared settings (currently empty placeholder for cross-platform files).
 - `stow/linux`: Linux shell/editor/git/tmux configs plus helper scripts in `.local/bin`.
 - `stow/mac`: macOS zsh/tmux/git configs and GPG agent files.
 - `scripts/linux`: one-off setup helpers (`vim-setup.sh`) run manually.
@@ -27,6 +27,7 @@ Notes:
 - Run stow from the repo root; add/swap packages as needed.
 - Linux shell startup will initialize `pyenv` when present and only run `pyenv virtualenv-init` if the plugin is installed.
 - Shell sessions are recorded to `~/logs/<date>_shell.log`; remove that block in `stow/linux/.bashrc` if you prefer not to log.
+- Global gitignore: bootstrap copies the repo root `.gitignore` to `~/.gitignore` and sets `core.excludesfile`.
 
 ## One-shot install
 ```sh
