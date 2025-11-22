@@ -7,6 +7,7 @@ PYENV_VERSION="${PYENV_VERSION:-3.12.7}"
 PYENV_ROOT="${HOME}/.pyenv"
 PYENV_PIP=""
 NERD_FONTS_VERSION="${NERD_FONTS_VERSION:-3.2.1}"
+FZF_MIN_VERSION="${FZF_MIN_VERSION:-0.56.0}"
 
 log() { printf '[dotfiles] %s\n' "$*"; }
 die() { log "$*"; exit 1; }
@@ -245,6 +246,36 @@ install_python_vim_deps() {
   "$pip_cmd" install --upgrade --user pynvim jedi || log "Warning: failed to install pynvim/jedi"
 }
 
+ensure_fzf_version() {
+  local fzf_bin="${HOME}/.local/bin/fzf"
+  local current_version=""
+
+  if command -v fzf >/dev/null 2>&1; then
+    current_version="$(fzf --version 2>/dev/null | awk '{print $1}')"
+  fi
+
+  if [ -n "$current_version" ] && [ "$(printf '%s\n%s\n' "$FZF_MIN_VERSION" "$current_version" | sort -V | tail -n1)" = "$current_version" ]; then
+    log "fzf ${current_version} already meets requirement (>= ${FZF_MIN_VERSION})"
+    return
+  fi
+
+  mkdir -p "${HOME}/.local/bin"
+  local archive="fzf-${FZF_MIN_VERSION}-linux_amd64.tar.gz"
+  local url="https://github.com/junegunn/fzf/releases/download/${FZF_MIN_VERSION}/${archive}"
+  local tmp
+  tmp="$(mktemp)"
+
+  log "Installing fzf ${FZF_MIN_VERSION} to ${fzf_bin}"
+  if ! curl -fsSL "${url}" -o "${tmp}"; then
+    log "Warning: failed to download fzf ${FZF_MIN_VERSION} from ${url}"
+    rm -f "${tmp}"
+    return
+  fi
+
+  tar -C "$(dirname "${fzf_bin}")" -xzf "${tmp}" fzf || log "Warning: failed to extract fzf archive"
+  rm -f "${tmp}"
+}
+
 install_tmux_plugins() {
   log "Installing tmux plugins (tpm and vim-tmux-focus-events)"
   mkdir -p "${HOME}/.tmux/plugins"
@@ -425,6 +456,7 @@ main() {
   ensure_pyenv
   install_node_tools
   install_python_vim_deps
+  ensure_fzf_version
   remove_stale_symlinks
   backup_conflicts
   stow_packages common linux

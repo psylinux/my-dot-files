@@ -21,7 +21,7 @@ set encoding=UTF-8
 let mapleader=","
 
 " Enable Elite mode (set to 1 to remap arrows to resize splits)
-let g:elite_mode=0
+let g:elite_mode=1
 let g:use_neocomplete = 0
 
 
@@ -341,6 +341,7 @@ if exists('+omnifunc')
     autocmd FileType python    setlocal omnifunc=pythoncomplete#Complete
   endif
   autocmd FileType xml         setlocal omnifunc=xmlcomplete#CompleteTags
+  autocmd FileType * if empty(&omnifunc) | setlocal omnifunc=syntaxcomplete#Complete | endif
 endif
 
 " Mapping selecting Mappings
