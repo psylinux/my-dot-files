@@ -144,6 +144,7 @@ build/
 ####################
 .vim/
 plugged/
+scripts/linux/LanguageTool-*/
 
 # GDB / GEF #
 ############
@@ -154,3 +155,5 @@ plugged/
 ###############
 /opt/nerd-fonts/
 logs/
+.DS_Store
+
