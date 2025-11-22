@@ -152,6 +152,30 @@ setup_markdown_preview_yarn() {
     log "Warning: yarn install for markdown-preview.nvim failed"
 }
 
+install_markdown_preview_deps() {
+  local plugin_app="${HOME}/.vim/bundle/markdown-preview.nvim/app"
+  local bin="${plugin_app}/node_modules/.bin/markdown-preview"
+
+  if [ ! -d "${plugin_app}" ]; then
+    log "Skipping markdown-preview.nvim deps (plugin app dir missing)"
+    return
+  fi
+  if [ -x "${bin}" ]; then
+    log "markdown-preview.nvim deps already installed"
+    return
+  fi
+
+  if command -v yarn >/dev/null 2>&1; then
+    log "Installing markdown-preview.nvim deps with yarn"
+    (cd "${plugin_app}" && yarn install) || log "Warning: yarn install for markdown-preview.nvim failed"
+  elif command -v npm >/dev/null 2>&1; then
+    log "Installing markdown-preview.nvim deps with npm"
+    (cd "${plugin_app}" && npm install) || log "Warning: npm install for markdown-preview.nvim failed"
+  else
+    log "Warning: npm/yarn not available; markdown-preview.nvim may not work until deps are installed"
+  fi
+}
+
 install_gef() {
   log "Installing GEF for GDB"
   sudo rm -rf /opt/gef
@@ -406,6 +430,7 @@ main() {
   stow_packages common linux
   install_vundle
   setup_markdown_preview_yarn
+  install_markdown_preview_deps
   install_gef
   install_vim_tools_apt
   install_tmux_plugins
