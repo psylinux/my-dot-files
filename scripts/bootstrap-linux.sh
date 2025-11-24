@@ -225,6 +225,7 @@ ensure_languagetool() {
     jar="$(find /opt/languagetool -maxdepth 2 -name 'languagetool-commandline.jar' | head -n1 || true)"
     if [ -n "$jar" ] && [ -f "$jar" ]; then
       sudo ln -sf "$jar" /opt/languagetool/languagetool-commandline.jar
+      sudo ln -sf "$jar" /opt/languagetool/LanguageTool.jar
       log "LanguageTool installed to /opt/languagetool"
     else
       log "Warning: downloaded LanguageTool but could not find jar"
