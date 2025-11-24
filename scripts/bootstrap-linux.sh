@@ -8,7 +8,7 @@ PYENV_ROOT="${HOME}/.pyenv"
 PYENV_PIP=""
 NERD_FONTS_VERSION="${NERD_FONTS_VERSION:-3.2.1}"
 FZF_MIN_VERSION="${FZF_MIN_VERSION:-0.56.0}"
-LANGUAGETOOL_VERSION="${LANGUAGETOOL_VERSION:-6.6}"
+LANGUAGETOOL_VERSION="${LANGUAGETOOL_VERSION:-5.9}"
 
 log() { printf '[dotfiles] %s\n' "$*"; }
 die() { log "$*"; exit 1; }
@@ -188,8 +188,15 @@ ensure_languagetool() {
 
   for j in "${jar_paths[@]}"; do
     if [ -f "$j" ]; then
-      log "LanguageTool detected at ${j}"
-      return
+      # Verify jar supports --api (needed by Vim plugin). If not, force reinstall.
+      if java -jar "$j" --help 2>&1 | grep -q -- '--api'; then
+        log "LanguageTool detected at ${j}"
+        return
+      else
+        log "LanguageTool jar at ${j} missing --api; reinstalling"
+        sudo rm -rf /opt/languagetool
+        break
+      fi
     fi
   done
 
