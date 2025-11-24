@@ -8,6 +8,7 @@ PYENV_ROOT="${HOME}/.pyenv"
 PYENV_PIP=""
 NERD_FONTS_VERSION="${NERD_FONTS_VERSION:-3.2.1}"
 FZF_MIN_VERSION="${FZF_MIN_VERSION:-0.56.0}"
+LANGUAGETOOL_VERSION="${LANGUAGETOOL_VERSION:-6.6}"
 
 log() { printf '[dotfiles] %s\n' "$*"; }
 die() { log "$*"; exit 1; }
@@ -175,6 +176,56 @@ install_markdown_preview_deps() {
   else
     log "Warning: npm/yarn not available; markdown-preview.nvim may not work until deps are installed"
   fi
+}
+
+ensure_languagetool() {
+  local jar_paths=(
+    "/opt/languagetool/languagetool-commandline.jar"
+    "/usr/share/languagetool/LanguageTool.jar"
+    "/usr/share/java/languagetool.jar"
+    "/usr/share/java/languagetool-standalone.jar"
+  )
+
+  for j in "${jar_paths[@]}"; do
+    if [ -f "$j" ]; then
+      log "LanguageTool detected at ${j}"
+      return
+    fi
+  done
+
+  if apt-cache show languagetool >/dev/null 2>&1; then
+    log "Installing LanguageTool via apt"
+    if sudo apt-get install -y languagetool; then
+      return
+    else
+      log "Warning: apt install of LanguageTool failed, will try manual download."
+    fi
+  fi
+
+  local url="https://languagetool.org/download/LanguageTool-${LANGUAGETOOL_VERSION}.zip"
+  local tmp
+  tmp="$(mktemp)"
+  log "Downloading LanguageTool ${LANGUAGETOOL_VERSION} from ${url}"
+  if ! curl -fsSL "${url}" -o "${tmp}"; then
+    log "Warning: failed to download LanguageTool from ${url}"
+    rm -f "${tmp}"
+    return
+  fi
+
+  sudo mkdir -p /opt/languagetool
+  if sudo unzip -oq "${tmp}" -d /opt/languagetool; then
+    local jar
+    jar="$(find /opt/languagetool -maxdepth 2 -name 'languagetool-commandline.jar' | head -n1 || true)"
+    if [ -n "$jar" ] && [ -f "$jar" ]; then
+      sudo ln -sf "$jar" /opt/languagetool/languagetool-commandline.jar
+      log "LanguageTool installed to /opt/languagetool"
+    else
+      log "Warning: downloaded LanguageTool but could not find jar"
+    fi
+  else
+    log "Warning: failed to unzip LanguageTool archive"
+  fi
+  rm -f "${tmp}"
 }
 
 install_gef() {
@@ -456,6 +507,7 @@ main() {
   ensure_pyenv
   install_node_tools
   install_python_vim_deps
+  ensure_languagetool
   ensure_fzf_version
   remove_stale_symlinks
   backup_conflicts
