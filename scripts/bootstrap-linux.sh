@@ -187,28 +187,8 @@ ensure_languagetool() {
     "/usr/share/java/languagetool-standalone.jar"
   )
 
-  for j in "${jar_paths[@]}"; do
-    if [ -f "$j" ]; then
-      # Verify jar supports --api (needed by Vim plugin). If not, force reinstall.
-      if java -jar "$j" --help 2>&1 | grep -q -- '--api'; then
-        log "LanguageTool detected at ${j}"
-        return
-      else
-        log "LanguageTool jar at ${j} missing --api; reinstalling"
-        sudo rm -rf /opt/languagetool
-        break
-      fi
-    fi
-  done
-
-  if apt-cache show languagetool >/dev/null 2>&1; then
-    log "Installing LanguageTool via apt"
-    if sudo apt-get install -y languagetool; then
-      return
-    else
-      log "Warning: apt install of LanguageTool failed, will try manual download."
-    fi
-  fi
+  # Remove any stale LanguageTool installs to ensure a consistent jar location.
+  sudo rm -rf /opt/languagetool
 
   local url="https://languagetool.org/download/LanguageTool-${LANGUAGETOOL_VERSION}.zip"
   local tmp
