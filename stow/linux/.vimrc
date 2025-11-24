@@ -22,7 +22,6 @@ let mapleader=","
 
 " Enable Elite mode (set to 1 to remap arrows to resize splits)
 let g:elite_mode=1
-let g:use_neocomplete = 0
 
 
 " ----------------------------------------------------
@@ -56,7 +55,6 @@ call vundle#begin()
   Plugin 'benmills/vimux'
   Plugin 'jeetsukumaran/vim-buffergator'
   Plugin 'gilsondev/searchtasks.vim'
-" neocomplete removed
   Plugin 'tpope/vim-dispatch'
   Plugin 'jceb/vim-orgmode'
   Plugin 'tpope/vim-speeddating'
@@ -226,8 +224,6 @@ let g:syntastic_check_on_open = 1
 " Neomake settings
 autocmd! BufWritePost * Neomake
 
-"""" Neocomplete Settings removed
-
 """" Markdown Syntax Support
 augroup markdown
     au!
@@ -241,8 +237,8 @@ let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 " Try to locate LanguageTool; fall back to common install paths.
 if !exists('g:languagetool_jar') || empty(g:languagetool_jar)
   for candidate in [
-        \ '/opt/languagetool/languagetool-commandline.jar',
-        \ '/opt/languagetool/LanguageTool-6.6/languagetool-commandline.jar',
+        \ '/opt/languagetool/languagetool.jar',
+        \ '/opt/languagetool/LanguageTool-6.6/languagetool.jar',
         \ '/usr/share/languagetool/LanguageTool.jar',
         \ '/usr/share/java/languagetool.jar',
         \ '/usr/share/java/languagetool-standalone.jar']
@@ -328,8 +324,6 @@ map <C-n> :NERDTreeToggle<CR>
 """" Ctags Configuration
 nnoremap <leader>. :CtrlPTag<cr>
 map <C-m> :TagbarToggle<CR>
-
-"""" Neocomplete mappings removed
 
 """" Omnifunc defaults (used by built-in <C-x><C-o>)
 if exists('+omnifunc')
