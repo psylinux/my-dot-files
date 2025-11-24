@@ -242,6 +242,7 @@ let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 if !exists('g:languagetool_jar') || empty(g:languagetool_jar)
   for candidate in [
         \ '/opt/languagetool/languagetool-commandline.jar',
+        \ '/opt/languagetool/LanguageTool-6.6/languagetool-commandline.jar',
         \ '/usr/share/languagetool/LanguageTool.jar',
         \ '/usr/share/java/languagetool.jar',
         \ '/usr/share/java/languagetool-standalone.jar']
