@@ -180,7 +180,8 @@ install_markdown_preview_deps() {
 
 ensure_languagetool() {
   local jar_paths=(
-    "/opt/languagetool/languagetool-commandline.jar"
+    "/opt/languagetool/languagetool.jar"
+    "/opt/languagetool/LanguageTool-${LANGUAGETOOL_VERSION}/languagetool.jar"
     "/usr/share/languagetool/LanguageTool.jar"
     "/usr/share/java/languagetool.jar"
     "/usr/share/java/languagetool-standalone.jar"
@@ -222,11 +223,10 @@ ensure_languagetool() {
   sudo mkdir -p /opt/languagetool
   if sudo unzip -oq "${tmp}" -d /opt/languagetool; then
     local jar
-    jar="$(find /opt/languagetool -maxdepth 2 -name 'languagetool-commandline.jar' | head -n1 || true)"
+    jar="$(find /opt/languagetool -maxdepth 3 -name 'languagetool.jar' | head -n1 || true)"
     if [ -n "$jar" ] && [ -f "$jar" ]; then
-      sudo ln -sf "$jar" /opt/languagetool/languagetool-commandline.jar
-      sudo ln -sf "$jar" /opt/languagetool/LanguageTool.jar
-      log "LanguageTool installed to /opt/languagetool"
+      sudo ln -sf "$jar" /opt/languagetool/languagetool.jar
+      log "LanguageTool installed to /opt/languagetool (jar: $jar)"
     else
       log "Warning: downloaded LanguageTool but could not find jar"
     fi
