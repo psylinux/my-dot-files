@@ -84,7 +84,6 @@ call vundle#begin()
   "Plugin 'reedes/vim-pencil'
   Plugin 'tpope/vim-markdown'
   Plugin 'jtratner/vim-flavored-markdown'
-  Plugin 'LanguageTool'
   Plugin 'junegunn/limelight.vim'         "dim other paragraphs
   Plugin 'godlygeek/tabular'              "aligning text with
 
@@ -233,21 +232,6 @@ augroup END
 " Vim-Supertab Configuration
 let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
 
-" Settings for Writting
-" Try to locate LanguageTool; fall back to common install paths.
-if !exists('g:languagetool_jar') || empty(g:languagetool_jar)
-  for candidate in [
-        \ '/opt/languagetool/languagetool.jar',
-        \ '/opt/languagetool/LanguageTool-6.6/languagetool.jar',
-        \ '/usr/share/languagetool/LanguageTool.jar',
-        \ '/usr/share/java/languagetool.jar',
-        \ '/usr/share/java/languagetool-standalone.jar']
-    if filereadable(expand(candidate))
-      let g:languagetool_jar = candidate
-      break
-    endif
-  endfor
-endif
 
 " Vim-pencil Configuration
 "let g:pencil#wrapModeDefault = 'soft'   " default is 'hard'
