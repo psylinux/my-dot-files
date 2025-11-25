@@ -1,3 +1,19 @@
+# ===== Configs que valem para QUALQUER shell (interativo ou não) =====
+# Exports importantes, PATH, variáveis que scripts também precisam:
+
+export PATH="$HOME/.local/bin:$PATH"
+export EDITOR="vim"
+
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
+
+# If not running interactively, don't do anything
+case $- in
+    *i*) ;;
+      *) return;;
+esac
+
 # Load Git functions
 source ~/.git-prompt.sh
 
@@ -36,15 +52,6 @@ bakcyn='\e[46m'   # Cyan
 bakwht='\e[47m'   # White
 txtrst='\e[0m'    # Text Reset
 
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -185,19 +192,38 @@ if ! ssh-add -l >/dev/null 2>&1; then
     eval "$(ssh-agent -s)" >/dev/null
 
     # Adiciona as chaves que você usa (ajuste os nomes se precisar)
-    ssh-add ~/.ssh/id_ed25519 ~/.ssh/id_rsa 2>/dev/null
+#    ssh-add ~/.ssh/id_ed25519 ~/.ssh/id_rsa 2>/dev/null
 fi
 
 # Customized PATH
 export PATH="$HOME/.local/bin:$HOME/go/bin:/usr/sbin:/usr/local/sbin:$PATH"
 
 # Recording the session (ensure log directory exists before using script)
-mkdir -p "$HOME/logs"
-test "$(ps -ocommand= -p $PPID | awk '{print $1}')" == 'script' || (script -f "$HOME/logs/$(date +"%d-%b-%y_%H-%M-%S")_shell.log")
-echo -e "===================================================================================="
-echo -e "*****************************  Recording this session  *****************************"
-echo -e "===================================================================================="
+#mkdir -p "$HOME/logs"
+#test "$(ps -ocommand= -p $PPID | awk '{print $1}')" == 'script' || (script -f "$HOME/logs/$(date +"%d-%b-%y_%H-%M-%S")_shell.log")
+#echo -e "===================================================================================="
+#echo -e "*****************************  Recording this session  *****************************"
+#echo -e "===================================================================================="
 
+# Alias recshell para iniciar gravacao do shell
+alias recshell='mkdir -p "$HOME/logs" && script -f "$HOME/logs/$(date +"%d-%b-%y_%H-%M-%S")_shell.log"'
+
+
+# Coisas do NVM
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Lazy-load do nvm: só carrega quando você chamar "nvm" pela primeira vez
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+  nvm() {
+    unset -f nvm
+    . "$NVM_DIR/nvm.sh"
+    nvm "$@"
+  }
+fi
+
+# (Opcional) lazy-load de completion do nvm
+_nvm_complete() {
+  unset -f _nvm_complete
+  [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
+}
+complete -o default -F _nvm_complete nvm 2>/dev/null || true

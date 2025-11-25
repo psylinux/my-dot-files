@@ -4,7 +4,7 @@
 [push]
 	default = simple
 [core]
-	excludesfile = ~/.gitignore
+	excludesFile = .gitignore
 [pull]
 	rebase = false
 [color]
