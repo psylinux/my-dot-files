@@ -43,9 +43,9 @@ call vundle#begin()
 
   """" Utility
   Plugin 'tmux-plugins/vim-tmux'          "tmux plugin
-  Plugin 'junegunn/goyo.vim'              "distraction free
-  Plugin 'majutsushi/tagbar'
-  Plugin 'ervandew/supertab'
+Plugin 'junegunn/goyo.vim'              "distraction free
+Plugin 'majutsushi/tagbar'
+Plugin 'ervandew/supertab'
   Plugin 'BufOnly.vim'
   Plugin 'wesQ3/vim-windowswap'
   Plugin 'SirVer/ultisnips'
@@ -231,6 +231,9 @@ augroup END
 
 " Vim-Supertab Configuration
 let g:SuperTabDefaultCompletionType = "<C-X><C-O>"
+
+" Tagbar: move focus to the Tagbar window when opened
+let g:tagbar_autofocus = 1
 
 
 " Vim-pencil Configuration
