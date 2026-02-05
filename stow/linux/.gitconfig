@@ -4,7 +4,7 @@
 [push]
 	default = simple
 [core]
-	excludesFile = .gitignore
+	excludesfile = /home/cowboy/.gitignore
 [pull]
 	rebase = false
 [color]
