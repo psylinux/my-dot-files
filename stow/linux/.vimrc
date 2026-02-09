@@ -43,9 +43,9 @@ call vundle#begin()
 
   """" Utility
   Plugin 'tmux-plugins/vim-tmux'          "tmux plugin
-Plugin 'junegunn/goyo.vim'              "distraction free
-Plugin 'majutsushi/tagbar'
-Plugin 'ervandew/supertab'
+  Plugin 'junegunn/goyo.vim'              "distraction free
+  Plugin 'majutsushi/tagbar'
+  Plugin 'ervandew/supertab'
   Plugin 'BufOnly.vim'
   Plugin 'wesQ3/vim-windowswap'
   Plugin 'SirVer/ultisnips'
@@ -383,6 +383,46 @@ omap <leader><tab> <plug>(fzf-maps-o)
 nnoremap <Leader>o :Files<CR>
 nnoremap <Leader>O :CtrlP<CR>
 nnoremap <Leader>w :w<CR>
+
+" C build/run shortcuts (buffer-local)
+augroup c_build_run
+  autocmd!
+  autocmd FileType c nnoremap <buffer> <Leader>m :w<CR>:call <SID>RunInBottomTerm('compile FILE=' . expand('%:p'))<CR>
+  autocmd FileType c nnoremap <buffer> <Leader>r :call <SID>RunInBottomTerm('run FILE=' . expand('%:p'))<CR>
+augroup END
+
+" Reuse a bottom split terminal for build/run output
+function! s:RunInBottomTerm(cmd) abort
+  let l:win = get(g:, 'c_build_term_winid', 0)
+  if l:win != 0 && win_gotoid(l:win)
+    " Reuse existing terminal window
+  else
+    try
+      botright split
+      let g:c_build_term_winid = win_getid()
+    catch /^Vim\%((\a\+)\)\=:E242/
+      return
+    endtry
+  endif
+  let l:dir = expand('%:p:h')
+  let l:root = ''
+  while !empty(l:dir)
+    if filereadable(l:dir . '/Makefile')
+      let l:root = l:dir
+      break
+    endif
+    let l:parent = fnamemodify(l:dir, ':h')
+    if l:parent ==# l:dir
+      break
+    endif
+    let l:dir = l:parent
+  endwhile
+  if empty(l:root)
+    let l:root = getcwd()
+  endif
+  let l:args = split(a:cmd)
+  call term_start(['make', '-C', l:root] + l:args, {'curwin': 1})
+endfunction
 
 " Insert mode completion
 imap <c-x><c-k> <plug>(fzf-complete-word)
