@@ -387,7 +387,7 @@ nnoremap <Leader>w :w<CR>
 " C build/run shortcuts (buffer-local)
 augroup c_build_run
   autocmd!
-  autocmd FileType c nnoremap <buffer> <Leader>m :w<CR>:call <SID>RunInBottomTerm('compile FILE=' . expand('%:p'))<CR>
+  autocmd FileType c nnoremap <buffer> <Leader>m :w<CR>:call <SID>RunInBottomTerm('build FILE=' . expand('%:p'))<CR>
   autocmd FileType c nnoremap <buffer> <Leader>r :call <SID>RunInBottomTerm('run FILE=' . expand('%:p'))<CR>
 augroup END
 
