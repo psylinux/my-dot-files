@@ -1,34 +1,47 @@
 # Repository Guidelines
 
-This repo centralizes personal dotfiles and helper scripts for Linux and macOS. Keep changes small, reproducible, and documented so contributors can safely mirror updates across platforms.
+This repo centralizes personal dotfiles plus bootstrap/install scripts for Linux and macOS. Keep changes small, idempotent, and documented so machines can be reprovisioned safely.
 
 ## Project Structure & Module Organization
-- `stow/common` is for shared assets across platforms (currently `.gitignore`).
-- `stow/linux` is the Stow package for Linux (`.bashrc`, `.vimrc`, `.tmux.conf`, `.gitconfig`, `.git-prompt.sh`, `.irssi`, `.vim/colors`, `.local/bin` helpers).
-- `stow/mac` is the macOS package (`.zshrc`, `.p10k.zsh`, `.tmux.conf`, `.gitconfig`, `.gnupg/gpg-agent.conf`, `.gnupg/sshcontrol`).
-- `scripts/linux` keeps one-off setup helpers.
-- `.ssh/` is tracked here but keep private material out of version control.
+- `install.sh` auto-detects OS and dispatches to `scripts/bootstrap-linux.sh` or `scripts/bootstrap-mac.sh`.
+- `scripts/bootstrap-linux.sh` is the Debian/Ubuntu bootstrap path (it exits if `apt-get` is unavailable).
+- `scripts/bootstrap-mac.sh` is the macOS bootstrap path (expects Homebrew).
+- `scripts/_template.sh` is the starter for adding new helper scripts under `scripts/`.
+- `stow/linux` contains Linux dotfiles and managed helpers in `stow/linux/.local/bin/`.
+- `stow/mac` contains macOS dotfiles (`.zshrc`, `.p10k.zsh`, `.tmux.conf`, `.gitconfig`, `.gnupg/*`).
+- `stow/common` is optional. The bootstrap scripts attempt to stow `common`, but will skip it if the directory does not exist.
+- `stow/linux/.ssh/config` is tracked; do not commit private keys or secrets.
 
 ## Build, Test, and Development Commands
-- No build step; validate shell scripts with `bash -n stow/linux/.local/bin/deb-update.sh` (or the target file) before pushing.
-- Run static checks when available: `shellcheck stow/linux/.local/bin/remove-old-kernel.sh`.
-- For dotfiles, spot-check loadability: `tmux source-file stow/linux/.tmux.conf`, `vim -u stow/linux/.vimrc +qall`, `source stow/linux/.bashrc`, and `source stow/mac/.zshrc` inside a throwaway shell.
-- Prefer non-interactive flows (`apt-get … -y`) and echo progress logs similar to existing scripts to aid remote debugging.
+- `make check`: runs `bash -n` for `install.sh` and `scripts/bootstrap-*.sh`.
+- `make lint`: runs `shellcheck` for `install.sh` and `scripts/bootstrap-*.sh` when installed.
+- `make stow-linux` / `make stow-mac`: dry-run Stow to catch conflicts before applying links.
+- `make bootstrap-linux` / `make bootstrap-mac`: runs full platform bootstrap (package/network side effects).
+- For edits under `stow/linux/.local/bin`, run direct checks such as `bash -n stow/linux/.local/bin/deb-update.sh` and `shellcheck stow/linux/.local/bin/remove-old-kernel.sh` when possible.
+- Dotfile spot checks in a throwaway shell/session: `tmux source-file stow/linux/.tmux.conf`, `vim -u stow/linux/.vimrc +qall`, `source stow/linux/.bashrc`, `source stow/mac/.zshrc`.
 
 ## Coding Style & Naming Conventions
-- Bash scripts should start with `#!/bin/bash`, use lowercase-hyphenated filenames, and favor readable pipelines over long one-liners.
-- Quote variables, use `set -euo pipefail` for new scripts unless it breaks existing flows, and keep indentation consistent (2 spaces is preferred when adding blocks).
-- Echo section headers (as in `deb-update.sh`) to make logs scannable; keep user prompts avoided unless guarded by a flag.
-- Keep config defaults minimal; mirror existing key ordering in dotfiles to reduce diff noise.
+- New scripts should use `#!/usr/bin/env bash` and `set -euo pipefail` unless legacy compatibility requires otherwise.
+- Use 2-space indentation, quote variables, and prefer readable pipelines over compact one-liners.
+- Keep bootstrap/install steps non-interactive and idempotent: check for existing tools first and use `-y` where supported.
+- Use clear `log "..."` messages for long-running steps so remote output is easy to scan.
+- Preserve ordering/style in dotfiles to minimize diff noise.
+- Legacy scripts under `stow/linux/.local/bin` mix `sh`/`bash` styles and may be interactive; keep behavior changes explicit and scoped.
 
 ## Testing Guidelines
-- Exercise update scripts in a disposable VM/container that matches the target distro before merging; avoid running destructive commands on hosts you cannot rebuild.
-- When touching `remove-old-kernel.sh`, dry-run logic by printing candidate packages first; confirm the exclusion regex still protects the running kernel.
-- Add brief usage examples in comments when behavior is non-obvious (e.g., required env vars, expected directory layout).
-- If a change affects multiple platforms, test both `linux/` and `mac/` flows or note what remains unverified.
+- Validate bootstrap changes in disposable environments that match targets:
+  - Linux: Debian/Ubuntu with `apt-get`.
+  - macOS: Homebrew installed.
+- If you touch npm installer flow, verify CLI availability (`claude --version`, `codex --version`) after bootstrap.
+- For Stow path changes, verify dry-run first (`make stow-linux` or `make stow-mac`) before real install.
+- For destructive helpers (for example `remove-old-kernel.sh` and `ubuntu_cleaner.sh`), prefer dry-run visibility first and avoid testing on irreplaceable hosts.
+- If a change impacts both platforms, test both or clearly note what remains unverified.
 
 ## Commit & Pull Request Guidelines
-- Follow existing commit tone: short, capitalized summaries in present tense (e.g., “Modifying `.vimrc` and `.tmux.conf`”); keep to ~72 characters.
-- Include what changed, why, and any side effects in the PR description; link issues when relevant.
-- Capture validation steps (commands run, platforms tested) and attach logs or screenshots when visual behavior changes (e.g., tmux status tweaks, Vim color changes).
-- Avoid bundling refactors with behavioral changes unless tightly coupled; call out any remaining TODOs or follow-up items.
+- Keep commit titles short, capitalized, present tense (about 72 chars max).
+- In PR descriptions, include:
+  - What changed.
+  - Why it changed.
+  - Side effects/migration notes.
+- Record validation commands and tested platforms.
+- Avoid mixing broad refactors with behavioral changes unless tightly coupled.
