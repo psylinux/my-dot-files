@@ -28,6 +28,7 @@ Notes:
 - Linux shell startup will initialize `pyenv` when present and only run `pyenv virtualenv-init` if the plugin is installed.
 - Shell sessions are recorded to `~/logs/<date>_shell.log`; remove that block in `stow/linux/.bashrc` if you prefer not to log.
 - Global gitignore: bootstrap copies the repo root `.gitignore` to `~/.gitignore` and sets `core.excludesfile`.
+- Claude Code (`claude`) and Codex (`codex`) are installed via npm by bootstrap scripts on Linux/macOS.
 
 ## One-shot install
 ```sh
@@ -35,13 +36,14 @@ git clone <repo-url> ~/my-dot-files
 cd ~/my-dot-files
 ./install.sh
 ```
-- macOS: ensures Stow is installed and stows `common` + `mac`.
+- macOS: ensures Homebrew tools (Stow + Node.js/npm) are installed, installs Claude Code + Codex, and stows `common` + `mac`.
 - Debian/Ubuntu: installs prerequisites (stow/vim/pyenv deps, ctags, mingw, irssi, etc.), backs up existing dotfiles, stows `common` + `linux`, installs Vundle/plugins, and sets up GEF.
 - Other Linux: stows `common` + `linux` (install extra build tools manually if needed).
 
 ### What the Linux bootstrap installs
 - Core tools: git, curl, stow, tmux, vim, irssi/bitlbee, build-essential toolchain, ctags, MinGW cross-compilers.
 - Vim helpers: fzf (>= ${FZF_MIN_VERSION:-0.56.0} ensured via binary download if needed), ripgrep, silversearcher-ag, python3 toolchain, nodejs/npm/yarn (for markdown-preview; falls back to npm if yarn fails), and Python packages `pynvim` + `jedi`.
+- AI coding CLIs: Claude Code (`@anthropic-ai/claude-code`) and Codex (`@openai/codex`) via npm.
 - Fonts: Nerd Font symbols (downloaded from nerd-fonts releases) plus fontconfig cache refresh for proper Airline/devicons glyphs.
 - pyenv with Python `${PYENV_VERSION}` for plugin support.
 - Vundle plugins, tmux plugins, and optional cron for log rotation.
