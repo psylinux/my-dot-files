@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Copyright 2020 Marcos Azevedo (aka pylinux) : psylinux[at]gmail.com
 #
@@ -63,4 +63,3 @@ for i in `ls *.$extensao`; do
 	echo "Movendo $i para $saida"
 	mv $i $saida
 done
-
