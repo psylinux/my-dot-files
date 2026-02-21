@@ -15,9 +15,9 @@ This repo centralizes personal dotfiles plus bootstrap/install scripts for Linux
 ## Build, Test, and Development Commands
 - `make check`: runs `bash -n` for `install.sh` and `scripts/bootstrap-*.sh`.
 - `make lint`: runs `shellcheck` for `install.sh` and `scripts/bootstrap-*.sh` when installed.
-- `make stow-linux` / `make stow-mac`: dry-run Stow to catch conflicts before applying links.
+- `make stow-linux` / `make stow-mac`: dry-run Stow to catch conflicts before applying links (auto-includes `common` only when `stow/common` exists).
 - `make bootstrap-linux` / `make bootstrap-mac`: runs full platform bootstrap (package/network side effects).
-- For edits under `stow/linux/.local/bin`, run direct checks such as `bash -n stow/linux/.local/bin/deb-update.sh` and `shellcheck stow/linux/.local/bin/remove-old-kernel.sh` when possible.
+- For edits under `stow/linux/.local/bin`, run direct checks using each script's shebang interpreter (for example `bash -n stow/linux/.local/bin/deb-update.sh` and `sh -n stow/linux/.local/bin/mount-shared-folders.sh`) plus `shellcheck` when possible.
 - Dotfile spot checks in a throwaway shell/session: `tmux source-file stow/linux/.tmux.conf`, `vim -u stow/linux/.vimrc +qall`, `source stow/linux/.bashrc`, `source stow/mac/.zshrc`.
 
 ## Coding Style & Naming Conventions

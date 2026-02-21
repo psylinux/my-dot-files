@@ -10,7 +10,7 @@
 ## Quickstart
 - Clone and run `./install.sh` to set up your machine.
 - Before opening a PR, run `make check` and `make lint` to catch syntax/lint issues.
-- Use dry-run Stow to spot conflicts: `make stow-linux` or `make stow-mac`.
+- Use dry-run Stow to spot conflicts: `make stow-linux` or `make stow-mac` (these include `common` automatically only when `stow/common` exists).
 
 ## Adding packages or installers
 - Linux: `scripts/bootstrap-linux.sh` is Debian/Ubuntu-oriented and exits if `apt-get` is not present. Add packages in `install_packages_apt` or add dedicated helpers when extra setup is required.
@@ -33,7 +33,7 @@
 
 ## Testing & validation
 - Minimum: `bash -n` on modified scripts and `shellcheck` when available (`make check` + `make lint` for install/bootstrap scripts).
-- If you modify files under `stow/linux/.local/bin`, run direct checks on those files (they are not included in `make lint` today).
+- If you modify files under `stow/linux/.local/bin`, run direct checks on those files using the interpreter from the shebang (`bash -n` for Bash scripts, `sh -n` for POSIX `sh` scripts); they are not included in `make lint` today.
 - Stow dry-run (`make stow-linux` / `make stow-mac`) to ensure no conflicts.
 - Spot-check dotfile loadability in a throwaway shell/tmux session after changes.
 - If you touch pyenv init, confirm shells still start cleanly without `pyenv virtualenv` installed.

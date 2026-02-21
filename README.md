@@ -69,5 +69,5 @@ Important:
 ## Helpful commands
 - `make check`: syntax check for install/bootstrap scripts (`bash -n`).
 - `make lint`: `shellcheck` for install/bootstrap scripts when available.
-- `make stow-linux` / `make stow-mac`: dry-run stow conflict detection.
+- `make stow-linux` / `make stow-mac`: dry-run stow conflict detection (auto-includes `common` when `stow/common` exists).
 - `make bootstrap-linux` / `make bootstrap-mac`: run bootstrap scripts directly.
