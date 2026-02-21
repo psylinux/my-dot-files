@@ -3,32 +3,14 @@
 Dotfiles for Linux and macOS managed with GNU Stow.
 
 ## Layout
-- `stow/common`: shared settings (currently empty placeholder for cross-platform files).
-- `stow/linux`: Linux shell/editor/git/tmux configs, `.ssh/config`, plus helper scripts in `.local/bin`.
-- `stow/mac`: macOS zsh/tmux/git configs and GPG agent files.
-- `scripts/linux`: one-off setup helpers (none currently).
-- `scripts/bootstrap-*.sh`: platform-specific bootstrap entrypoints called by `install.sh`.
-- `Makefile`: shortcuts for linting, dry-run stow, and bootstrapping.
-
-## Using Stow
-```sh
-# Linux
-stow -d stow -t ~ common linux
-
-# macOS
-stow -d stow -t ~ common mac
-
-# Unstow a package
-stow -d stow -t ~ -D linux
-```
-
-Notes:
-- Ensure `~/.local/bin` is on `PATH` (the Linux `.bashrc` does this).
-- Run stow from the repo root; add/swap packages as needed.
-- Linux shell startup will initialize `pyenv` when present and only run `pyenv virtualenv-init` if the plugin is installed.
-- Shell sessions are recorded to `~/logs/<date>_shell.log`; remove that block in `stow/linux/.bashrc` if you prefer not to log.
-- Global gitignore: bootstrap copies the repo root `.gitignore` to `~/.gitignore` and sets `core.excludesfile`.
-- Claude Code (`claude`) and Codex (`codex`) are installed via npm by bootstrap scripts on Linux/macOS.
+- `install.sh`: detects OS and runs the platform bootstrap script.
+- `scripts/bootstrap-linux.sh`: Debian/Ubuntu bootstrap (apt-based), plus stow and post-install setup.
+- `scripts/bootstrap-mac.sh`: macOS bootstrap (Homebrew-based), plus stow.
+- `scripts/_template.sh`: template for new scripts in `scripts/`.
+- `stow/linux`: Linux shell/editor/git/tmux/ssh files and helper scripts in `.local/bin`.
+- `stow/mac`: macOS zsh/tmux/git/GPG files.
+- `stow/common`: optional shared package (currently not present in this repo).
+- `Makefile`: shortcuts for lint/syntax checks, stow dry-run, and direct bootstrap runs.
 
 ## One-shot install
 ```sh
@@ -36,21 +18,56 @@ git clone <repo-url> ~/my-dot-files
 cd ~/my-dot-files
 ./install.sh
 ```
-- macOS: ensures Homebrew tools (Stow + Node.js/npm) are installed, installs Claude Code + Codex, and stows `common` + `mac`.
-- Debian/Ubuntu: installs prerequisites (stow/vim/pyenv deps, ctags, mingw, irssi, etc.), backs up existing dotfiles, stows `common` + `linux`, installs Vundle/plugins, and sets up GEF.
-- Other Linux: stows `common` + `linux` (install extra build tools manually if needed).
 
-### What the Linux bootstrap installs
-- Core tools: git, curl, stow, tmux, vim, irssi/bitlbee, build-essential toolchain, ctags, MinGW cross-compilers.
-- Vim helpers: fzf (>= ${FZF_MIN_VERSION:-0.56.0} ensured via binary download if needed), ripgrep, silversearcher-ag, python3 toolchain, nodejs/npm/yarn (for markdown-preview; falls back to npm if yarn fails), and Python packages `pynvim` + `jedi`.
-- AI coding CLIs: Claude Code (`@anthropic-ai/claude-code`) and Codex (`@openai/codex`) via npm.
-- Fonts: Nerd Font symbols (downloaded from nerd-fonts releases) plus fontconfig cache refresh for proper Airline/devicons glyphs.
-- pyenv with Python `${PYENV_VERSION}` for plugin support.
-- Vundle plugins, tmux plugins, and optional cron for log rotation.
-- If `markdown-preview.nvim` is present, bootstrap installs its JS deps (prefers `asdf`/yarn when available, falls back to npm).
+Current behavior:
+- macOS:
+  - Requires Homebrew.
+  - Ensures `stow` and Node.js/npm are installed.
+  - Installs Claude Code (`claude`) and Codex (`codex`) via npm.
+  - Stows `common` (if present) and `mac`.
+- Linux:
+  - Requires `apt-get` (Debian/Ubuntu path).
+  - Installs base packages, pyenv + Python, Vim/tmux tooling, GEF, Nerd Font symbols.
+  - Installs Claude Code (`claude`) and Codex (`codex`) via npm.
+  - Stows `common` (if present) and `linux`.
+
+## Using Stow manually
+```sh
+# Linux
+stow -d stow -t ~ linux
+
+# macOS
+stow -d stow -t ~ mac
+
+# If you add a shared package later
+stow -d stow -t ~ common linux
+
+# Unstow
+stow -d stow -t ~ -D linux
+```
+
+Notes:
+- Ensure `~/.local/bin` is on `PATH`.
+- Bootstrap copies repo `.gitignore` to `~/.gitignore` and sets `git config --global core.excludesfile ~/.gitignore`.
+- Linux bootstrap removes stale symlinks for managed paths before re-stowing.
+- Linux bootstrap backs up conflicting dotfiles (for a fixed list such as `.bashrc`, `.vimrc`, `.tmux.conf`, etc.) into `~/.dotfiles-backup-<timestamp>`.
+
+## Linux managed helper scripts
+Files in `stow/linux/.local/bin/` are stowed as symlinks into `~/.local/bin/`:
+- `deb-update.sh`
+- `fedora-update.sh`
+- `mount-shared-folders.sh`
+- `muda-extensao.sh`
+- `redimensiona.sh`
+- `remove-old-kernel.sh`
+- `restart-vm-tools.sh`
+- `ubuntu_cleaner.sh`
+
+Important:
+- Existing regular files in `~/.local/bin` with the same names are not auto-backed up by bootstrap and can cause Stow conflicts.
 
 ## Helpful commands
-- `make lint`: run `shellcheck` if available against key scripts.
-- `make check`: syntax-check scripts with `bash -n`.
-- `make stow-linux` / `make stow-mac`: dry-run Stow to detect conflicts.
-- `make bootstrap-linux` / `make bootstrap-mac`: run the platform bootstrap scripts directly.
+- `make check`: syntax check for install/bootstrap scripts (`bash -n`).
+- `make lint`: `shellcheck` for install/bootstrap scripts when available.
+- `make stow-linux` / `make stow-mac`: dry-run stow conflict detection.
+- `make bootstrap-linux` / `make bootstrap-mac`: run bootstrap scripts directly.
