@@ -231,6 +231,45 @@ install_node_tools() {
   fi
 }
 
+install_npm_cli() {
+  local label="$1"
+  local package_name="$2"
+  local bin_name="$3"
+  local version="unknown"
+
+  if command -v "${bin_name}" >/dev/null 2>&1; then
+    version="$("${bin_name}" --version 2>/dev/null | head -n 1 || true)"
+    log "${label} already installed (${version})"
+    return
+  fi
+
+  if ! command -v npm >/dev/null 2>&1; then
+    log "npm not available; skipping ${label} install"
+    return
+  fi
+
+  log "Installing ${label} via npm package ${package_name}"
+  if npm install -g "${package_name}"; then
+    :
+  elif NPM_CONFIG_PREFIX="${HOME}/.local" npm install -g "${package_name}"; then
+    if [ -x "${HOME}/.local/bin/${bin_name}" ]; then
+      log "${label} installed to ${HOME}/.local/bin/${bin_name}"
+    fi
+  else
+    log "Warning: failed to install ${label}"
+    return
+  fi
+
+  if ! command -v "${bin_name}" >/dev/null 2>&1 && [ -x "${HOME}/.local/bin/${bin_name}" ]; then
+    log "Warning: ${bin_name} is installed but not on PATH; ensure \$HOME/.local/bin is exported."
+  fi
+}
+
+install_ai_coding_tools() {
+  install_npm_cli "Claude Code" "@anthropic-ai/claude-code" "claude"
+  install_npm_cli "Codex" "@openai/codex" "codex"
+}
+
 install_python_vim_deps() {
   local pip_cmd="${PYENV_PIP:-$(command -v pip3 || true)}"
   if [ -z "$pip_cmd" ]; then
@@ -455,6 +494,7 @@ main() {
   install_mingw_apt
   ensure_pyenv
   install_node_tools
+  install_ai_coding_tools
   install_python_vim_deps
   ensure_fzf_version
   remove_stale_symlinks
