@@ -20,12 +20,6 @@ echo "-------------------------------"
 apt-get install lsb-base -y
 
 echo "-------------------------------"
-echo " Updating ZSH plugins: "
-echo "-------------------------------"
-omz update
-asdf update
-
-echo "-------------------------------"
 echo " Current Version Info Follows: "
 echo "-------------------------------"
 lsb_release -i
