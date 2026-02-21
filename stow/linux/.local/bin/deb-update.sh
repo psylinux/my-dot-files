@@ -14,6 +14,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 echo "-------------------------------"
 echo " Installing Dependencies:      "
 echo "-------------------------------"
@@ -41,7 +43,7 @@ apt-get autoremove -y
 echo "----- CLEAN -----"
 apt-get clean
 echo "---- REMOVING OLD KERNELS ----"
-./remove-old-kernel.sh
+"${SCRIPT_DIR}/remove-old-kernel.sh"
 echo "------------------------------"
 echo " Device Version Info Follows: "
 echo "------------------------------"
@@ -53,5 +55,4 @@ printf "Kernel Version: ";uname -r
 printf "Processor Type: ";uname -m
 echo "------------------------------"
 echo "System Updated - $(date +%d-%m-%Y-%H:%M)" >> /root/update.log
-
 
