@@ -11,10 +11,14 @@ check:
 	@set -e; for file in $(SCRIPTS); do bash -n $$file; done
 
 stow-linux:
-	@stow -d stow -t $$HOME -n -v common linux
+	@packages="linux"; \
+	if [ -d stow/common ]; then packages="common $$packages"; fi; \
+	stow -d stow -t $$HOME -n -v $$packages
 
 stow-mac:
-	@stow -d stow -t $$HOME -n -v common mac
+	@packages="mac"; \
+	if [ -d stow/common ]; then packages="common $$packages"; fi; \
+	stow -d stow -t $$HOME -n -v $$packages
 
 bootstrap-linux:
 	@./scripts/bootstrap-linux.sh

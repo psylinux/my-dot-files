@@ -22,16 +22,8 @@ ensure_stow() {
     return
   fi
 
-  log "GNU Stow not found, attempting install..."
-  if command -v apt-get >/dev/null 2>&1; then
-    sudo apt-get install -y stow || die "Failed to install stow via apt-get."
-  elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y stow || die "Failed to install stow via dnf."
-  elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman --noconfirm -S stow || die "Failed to install stow via pacman."
-  else
-    die "Package manager not detected. Install stow manually."
-  fi
+  log "GNU Stow not found, installing via apt-get..."
+  sudo apt-get install -y stow || die "Failed to install stow via apt-get."
 }
 
 install_packages_apt() {
