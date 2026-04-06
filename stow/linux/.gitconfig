@@ -15,3 +15,9 @@
 	status = auto
 [init]
 	defaultBranch = master
+[safe]
+	directory = /mnt/hgfs/RedTiger/project-viplobby/poc_v09
+	directory = /mnt/hgfs/Pentest/evolution/evolution/asia_crm/asia-crm-src
+	directory = /mnt/hgfs/Pentest/evolution/redtiger/viplobby/viplobby-src/backend-rtg-vip-lobby-portal
+	directory = /mnt/hgfs/Pentest/evolution/redtiger/viplobby/viplobby-src/backend-rtg-vip-lobby-portal
+	directory = /mnt/hgfs/Pentest/evolution/redtiger/viplobby/viplobby-src/backend-rtg-vip-lobby-admin
