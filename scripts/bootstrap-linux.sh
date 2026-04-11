@@ -323,30 +323,63 @@ install_tmux_plugins() {
   log "Reload tmux (prefix + r) and press prefix + I inside tmux to fetch plugins."
 }
 
-install_nerd_font_symbols() {
-  local font_dir="${HOME}/.local/share/fonts/nerd-fonts-symbols"
-  local font_file="${font_dir}/NerdFontsSymbolsOnly-Regular.ttf"
-  if [ -f "${font_file}" ]; then
-    log "Nerd Font symbols already present"
+install_nerd_fonts() {
+  local font_dir="${HOME}/.local/share/fonts/JetBrainsMonoNF"
+  local font_check="${font_dir}/JetBrainsMonoNerdFont-Regular.ttf"
+  if [ -f "${font_check}" ]; then
+    log "JetBrainsMono Nerd Font already present"
     return
   fi
 
   mkdir -p "${font_dir}"
-  local zip_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${NERD_FONTS_VERSION}/NerdFontsSymbolsOnly.zip"
+  local zip_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v${NERD_FONTS_VERSION}/JetBrainsMono.zip"
   local tmp_zip
   tmp_zip="$(mktemp)"
 
-  log "Downloading Nerd Font symbols (v${NERD_FONTS_VERSION})"
+  log "Downloading JetBrainsMono Nerd Font (v${NERD_FONTS_VERSION})"
   if ! curl -fsSL "${zip_url}" -o "${tmp_zip}"; then
-    log "Warning: failed to download Nerd Font symbols from ${zip_url}"
+    log "Warning: failed to download JetBrainsMono Nerd Font from ${zip_url}"
     rm -f "${tmp_zip}"
     return
   fi
 
-  log "Installing Nerd Font symbols to ${font_dir}"
-  unzip -oq "${tmp_zip}" -d "${font_dir}"
+  log "Installing JetBrainsMono Nerd Font to ${font_dir}"
+  unzip -oq "${tmp_zip}" '*.ttf' -d "${font_dir}"
   rm -f "${tmp_zip}"
   fc-cache -f "${font_dir}" || log "Warning: fc-cache failed; fonts may require relogin"
+}
+
+configure_tilix() {
+  if ! command -v tilix >/dev/null 2>&1; then
+    return
+  fi
+  if ! command -v dconf >/dev/null 2>&1; then
+    log "dconf not available; skipping Tilix configuration"
+    return
+  fi
+
+  # Find the first (default) Tilix profile
+  local profile_id
+  profile_id="$(dconf list /com/gexperts/Tilix/profiles/ 2>/dev/null | grep -oE '[0-9a-f-]{36}' | head -1)"
+  if [ -z "${profile_id}" ]; then
+    log "No Tilix profile found; skipping Tilix configuration"
+    return
+  fi
+
+  local ppath="/com/gexperts/Tilix/profiles/${profile_id}/"
+  log "Configuring Tilix profile ${profile_id} with Monokai Dark + JetBrainsMono Nerd Font"
+
+  # Monokai Dark colour scheme
+  dconf write "${ppath}background-color" "'#272822'"
+  dconf write "${ppath}foreground-color" "'#F8F8F2'"
+  dconf write "${ppath}use-theme-colors" "false"
+  dconf write "${ppath}palette" "['#272822','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f8f8f2','#75715e','#f92672','#a6e22e','#f4bf75','#66d9ef','#ae81ff','#a1efe4','#f9f8f5']"
+
+  # Font: JetBrainsMono Nerd Font (only if the font was installed)
+  if fc-list 2>/dev/null | grep -qi 'JetBrainsMono'; then
+    dconf write "${ppath}font" "'JetBrainsMono Nerd Font 12'"
+    dconf write "${ppath}use-system-font" "false"
+  fi
 }
 
 ensure_logs_cron() {
@@ -498,7 +531,8 @@ main() {
   install_gef
   install_vim_tools_apt
   install_tmux_plugins
-  install_nerd_font_symbols
+  install_nerd_fonts
+  configure_tilix
   ensure_logs_cron
   log "Done. Restart your shell to pick up any PATH changes."
 }
