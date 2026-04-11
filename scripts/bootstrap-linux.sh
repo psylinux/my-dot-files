@@ -33,7 +33,7 @@ install_packages_apt() {
     python3 python3-pip python3-venv python3-dev
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev
     libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
-    fzf ripgrep silversearcher-ag default-jre-headless nodejs npm
+    fzf ripgrep silversearcher-ag default-jre-headless nodejs
     unzip fontconfig
   )
   log "Installing base packages (${#packages_common[@]})"
