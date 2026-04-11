@@ -34,7 +34,7 @@ install_packages_apt() {
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev
     libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
     fzf ripgrep silversearcher-ag default-jre-headless nodejs
-    unzip fontconfig
+    unzip fontconfig zsh
   )
   log "Installing base packages (${#packages_common[@]})"
   sudo apt-get install -y "${packages_common[@]}"
@@ -207,6 +207,24 @@ EOF
 install_vim_tools_apt() {
   log "Installing VIM tools (vim-python-jedi)"
   sudo apt-get install -y vim-python-jedi || log "vim-python-jedi not available; skipping."
+}
+
+ensure_zsh_default() {
+  if [ "$(getent passwd "$USER" | cut -d: -f7)" = "$(command -v zsh)" ]; then
+    log "zsh is already the default shell"
+    return
+  fi
+  log "Setting zsh as default shell for $USER"
+  sudo chsh -s "$(command -v zsh)" "$USER"
+}
+
+install_oh_my_zsh() {
+  if [ -d "${HOME}/.oh-my-zsh" ]; then
+    log "Oh My Zsh already installed"
+    return
+  fi
+  log "Installing Oh My Zsh (unattended)"
+  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 }
 
 install_node_tools() {
@@ -419,6 +437,7 @@ backup_conflicts() {
   local backup_dir="${HOME}/.dotfiles-backup-$(date +%Y%m%d%H%M%S)"
   local paths=(
     ".bashrc"
+    ".zshrc"
     ".gitconfig"
     ".gitignore"
     ".ssh/config"
@@ -452,6 +471,7 @@ backup_conflicts() {
 remove_stale_symlinks() {
   local paths=(
     ".bashrc"
+    ".zshrc"
     ".gitconfig"
     ".gitignore"
     ".ssh/config"
@@ -517,6 +537,8 @@ main() {
   install_packages_apt
   install_ctags_apt
   install_mingw_apt
+  ensure_zsh_default
+  install_oh_my_zsh
   ensure_pyenv
   install_node_tools
   install_ai_coding_tools
