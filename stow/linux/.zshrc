@@ -6,18 +6,31 @@ export EDITOR="vim"
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
 plugins=(git)
+
+# Speed up completion init: only rebuild zcompdump once every 24h.
+ZSH_DISABLE_COMPFIX=true
+skip_global_compinit=1
+autoload -Uz compinit
+if [[ -n $HOME/.zcompdump(#qN.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+
 [ -f "$ZSH/oh-my-zsh.sh" ] && source "$ZSH/oh-my-zsh.sh"
 
-# ===== PyEnv =====
+# ===== PyEnv (lazy-loaded) =====
 export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
+export PATH="$PYENV_ROOT/bin:$PYENV_ROOT/shims:$PATH"
 export PYTHON_CONFIGURE_OPTS="--enable-shared"
-if command -v pyenv >/dev/null 2>&1; then
-  eval "$(pyenv init -)"
-  if pyenv commands | grep -Fqx virtualenv-init 2>/dev/null; then
-    eval "$(pyenv virtualenv-init -)"
+pyenv() {
+  unset -f pyenv
+  eval "$(command pyenv init -)"
+  if command pyenv commands | grep -Fqx virtualenv-init 2>/dev/null; then
+    eval "$(command pyenv virtualenv-init -)"
   fi
-fi
+  pyenv "$@"
+}
 
 # ===== History =====
 HISTSIZE=10000
@@ -42,7 +55,8 @@ if ! ssh-add -l >/dev/null 2>&1; then
   eval "$(ssh-agent -s)" >/dev/null
 fi
 
-# ===== VMware shared folders =====
-if command -v mount-shared-folders.sh >/dev/null 2>&1; then
+# ===== VMware shared folders (login shells only) =====
+if [[ -o login ]] && command -v mount-shared-folders.sh >/dev/null 2>&1; then
   mount-shared-folders.sh
 fi
+export PATH="$HOME/.cargo/bin:$PATH"
