@@ -227,3 +227,4 @@ _nvm_complete() {
   [ -s "$NVM_DIR/bash_completion" ] && . "$NVM_DIR/bash_completion"
 }
 complete -o default -F _nvm_complete nvm 2>/dev/null || true
+export PATH="$HOME/.cargo/bin:$PATH"
