@@ -78,9 +78,13 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(gpg-agent git wd docker zsh-autosuggestions zsh-syntax-highlighting vscode) 
+plugins=(gpg-agent git wd docker zsh-autosuggestions zsh-syntax-highlighting vscode)
+
+# Keep SSH on the macOS agent; gpg-agent is used for GPG only.
+zstyle ':omz:plugins:gpg-agent' ssh-support no
 
 source $ZSH/oh-my-zsh.sh
+command -v omp >/dev/null 2>&1 && eval "$(omp completions zsh)"
 
 # User configuration
 
@@ -108,5 +112,10 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh" || true
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+export PATH="$HOME/.local/bin:$PATH"
+[[ -d "$HOME/Library/CloudStorage/Dropbox/Pentest/evolution/my_projects/ghidra" ]] && export GHIDRA_INSTALL_DIR="$HOME/Library/CloudStorage/Dropbox/Pentest/evolution/my_projects/ghidra"
