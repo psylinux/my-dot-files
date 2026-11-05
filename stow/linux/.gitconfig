@@ -13,3 +13,6 @@
 	status = auto
 [init]
 	defaultBranch = master
+# Machine-local settings (e.g. safe.directory for engagement paths) live in this untracked file.
+[include]
+	path = ~/.gitconfig.local

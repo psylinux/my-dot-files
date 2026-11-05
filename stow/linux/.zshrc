@@ -1,6 +1,11 @@
 # ===== Exports and PATH (apply to all shells) =====
+# Keep PATH entries unique so nested shells (tmux panes, subshells) don't stack duplicates.
+typeset -U path PATH
 export PATH="$HOME/.local/bin:$HOME/go/bin:/usr/sbin:/usr/local/sbin:$PATH"
 export EDITOR="vim"
+if [ -d /usr/lib/jvm/default-java ]; then
+  export JAVA_HOME="/usr/lib/jvm/default-java"
+fi
 
 # ===== Oh My Zsh =====
 export ZSH="$HOME/.oh-my-zsh"
