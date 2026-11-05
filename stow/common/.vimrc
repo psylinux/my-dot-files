@@ -178,6 +178,7 @@ endif
 """" Set Proper Tabs
 set tabstop=4
 set shiftwidth=4
+set softtabstop=4               "TAB and BACKSPACE move in 4-space steps
 set smarttab
 set expandtab
 

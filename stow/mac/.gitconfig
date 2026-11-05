@@ -3,7 +3,5 @@
 	email = psylinux@gmail.com
 [push]
 	default = simple
-[core]
-	excludesfile = ~/.gitignore
 [pull]
 	rebase = false
