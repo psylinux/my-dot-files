@@ -1,0 +1,62 @@
+# Global git ignore list, applied to every repo on this machine.
+# Git reads ~/.config/git/ignore by default, so no core.excludesfile is set.
+# Keep this to personal OS, editor and tool noise. Anything a project might
+# want to commit (lockfiles, build output, archives, logs, binaries) belongs
+# in that project's own .gitignore.
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+.DocumentRevisions-V100
+.fseventsd
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+.apdisk
+Network Trash Folder
+Temporary Items
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Editors
+*.swp
+*.swo
+.vscode/
+.idea/
+*.sublime-workspace
+.SublimeREPLHistory
+
+# Xcode per-user state
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.moved-aside
+
+# Python caches and virtualenvs
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env/
+
+# Node
+node_modules/
+
+# GDB / GEF
+.gdb_history
+.gef.*
+
+# Office lock files
+~$*
+
+# Claude Code per-user settings
+**/.claude/settings.local.json

@@ -9,8 +9,9 @@ This repo centralizes personal dotfiles plus bootstrap/install scripts for Linux
 - `scripts/_template.sh` is the starter for adding new helper scripts under `scripts/`.
 - `stow/linux` contains Linux dotfiles and managed helpers in `stow/linux/.local/bin/`.
 - `stow/mac` contains macOS dotfiles (`.zshrc`, `.p10k.zsh`, `.tmux.conf`, `.gitconfig`, `.gnupg/*`).
-- `stow/common` is optional. The bootstrap scripts attempt to stow `common`, but will skip it if the directory does not exist.
-- `stow/linux/.ssh/config` is tracked; do not commit private keys or secrets.
+- `stow/common` holds files shared by both platforms (`.vimrc` and the global git ignore list `.config/git/ignore`). Both bootstrap scripts stow it alongside their platform package.
+- `stow/linux/.ssh/config` is tracked; do not commit private keys or secrets. The repo is public.
+- Stowed files are symlinks into this repo, so anything that writes to them edits tracked files. Always stow with `--no-folding` (so apps never write into `stow/`), and never call `git config --global` from bootstrap code.
 
 ## Build, Test, and Development Commands
 - `make check`: runs `bash -n` for `install.sh` and `scripts/bootstrap-*.sh`.
@@ -18,7 +19,7 @@ This repo centralizes personal dotfiles plus bootstrap/install scripts for Linux
 - `make stow-linux` / `make stow-mac`: dry-run Stow to catch conflicts before applying links (auto-includes `common` only when `stow/common` exists).
 - `make bootstrap-linux` / `make bootstrap-mac`: runs full platform bootstrap (package/network side effects).
 - For edits under `stow/linux/.local/bin`, run direct checks using each script's shebang interpreter (for example `bash -n stow/linux/.local/bin/deb-update.sh` and `sh -n stow/linux/.local/bin/mount-shared-folders.sh`) plus `shellcheck` when possible.
-- Dotfile spot checks in a throwaway shell/session: `tmux source-file stow/linux/.tmux.conf`, `vim -u stow/linux/.vimrc +qall`, `source stow/linux/.bashrc`, `source stow/mac/.zshrc`.
+- Dotfile spot checks in a throwaway shell/session: `tmux source-file stow/linux/.tmux.conf`, `vim -u stow/common/.vimrc +qall`, `source stow/linux/.bashrc`, `source stow/mac/.zshrc`.
 
 ## Coding Style & Naming Conventions
 - New scripts should use `#!/usr/bin/env bash` and `set -euo pipefail` unless legacy compatibility requires otherwise.
