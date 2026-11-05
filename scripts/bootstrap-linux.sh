@@ -433,37 +433,52 @@ ensure_logs_cron() {
   rm -f "${tmp_cron}"
 }
 
-backup_conflicts() {
-  local backup_dir="${HOME}/.dotfiles-backup-$(date +%Y%m%d%H%M%S)"
-  local paths=(
-    ".bashrc"
-    ".zshrc"
-    ".gitconfig"
-    ".gitignore"
-    ".ssh/config"
-    ".tmux.conf"
-    ".vimrc"
-    ".vim"
-    ".irssi"
-    ".git-prompt.sh"
-  )
+resolve_path() {
+  # Fully resolved path. Prints a path even for dangling links (exit 1).
+  readlink -f "$1" 2>/dev/null || true
+}
 
-  local any=0
-  for p in "${paths[@]}"; do
-    local target="${HOME}/${p}"
-    if [ -L "$target" ]; then
-      log "Removing existing symlink ${p}"
-      rm -f "$target"
+backup_conflicts() {
+  # Move aside anything at a path the given stow packages manage that stow
+  # would refuse to replace: regular files, and symlinks pointing anywhere
+  # other than this repo's copy (stale links from an old checkout, links
+  # owned by another tool). The path list comes from the packages themselves,
+  # so whole directories such as ~/.vim or ~/.irssi are never moved.
+  local stamp backup_dir repo_real
+  stamp="$(date +%Y%m%d%H%M%S)"
+  backup_dir="${HOME}/.dotfiles-backup-${stamp}"
+  repo_real="$(resolve_path "${ROOT_DIR}")"
+
+  local any=0 pkg pkg_dir src rel target target_real
+  for pkg in "$@"; do
+    pkg_dir="${STOW_DIR}/${pkg}"
+    [ -d "${pkg_dir}" ] || continue
+    while IFS= read -r -d '' src; do
+      rel="${src#"${pkg_dir}/"}"
+      target="${HOME}/${rel}"
+      if [ ! -e "${target}" ] && [ ! -L "${target}" ]; then
+        continue
+      fi
+      # Already ours, directly or through a folded parent directory
+      # (stow -R --no-folding turns a folded parent back into a real one).
+      target_real="$(resolve_path "${target}")"
+      if [ "${target_real}" = "$(resolve_path "${src}")" ]; then
+        continue
+      fi
+      # A real file reached through a parent symlink into this repo: moving
+      # it would move a repo file. Leave it for stow to report.
+      if [ ! -L "${target}" ] && [[ "${target_real}" == "${repo_real}/"* ]]; then
+        log "Warning: ~/${rel} resolves into this repo (${target_real}); not moving it"
+        continue
+      fi
+      log "Backing up ~/${rel} to ${backup_dir}/${rel}"
+      mkdir -p "${backup_dir}/$(dirname "${rel}")"
+      mv "${target}" "${backup_dir}/${rel}"
       any=1
-    elif [ -e "$target" ]; then
-      log "Backing up ${p} to ${backup_dir}/${p}"
-      mkdir -p "${backup_dir}/$(dirname "$p")"
-      mv "$target" "${backup_dir}/${p}"
-      any=1
-    fi
+    done < <(find "${pkg_dir}" \( -type f -o -type l \) -print0)
   done
 
-  if [ "$any" -eq 1 ]; then
+  if [ "${any}" -eq 1 ]; then
     log "Backups stored in ${backup_dir}"
   fi
 }
@@ -518,12 +533,13 @@ stow_packages() {
 
   mkdir -p "$HOME/.local/bin"
   log "Stowing packages: ${packages[*]}"
-  stow -d "$STOW_DIR" -t "$HOME" -R "${packages[@]}"
+  # --no-folding: never symlink a whole directory (e.g. ~/.ssh, ~/.irssi) into
+  # the repo, or tools would write keys and runtime data into the work tree.
+  stow -d "$STOW_DIR" -t "$HOME" -R --no-folding "${packages[@]}"
 
-  if [ -f "${ROOT_DIR}/.gitignore" ]; then
-    cp "${ROOT_DIR}/.gitignore" "${HOME}/.gitignore"
-    git config --global core.excludesfile "${HOME}/.gitignore" || log "Warning: failed to set global git excludesfile"
-  fi
+  # The global git ignore list is stowed to ~/.config/git/ignore, which git
+  # reads with no config. Don't add `git config --global` calls: ~/.gitconfig
+  # is a symlink into this repo, so git would rewrite the tracked file.
 }
 
 main() {
@@ -545,7 +561,7 @@ main() {
   install_python_vim_deps
   ensure_fzf_version
   remove_stale_symlinks
-  backup_conflicts
+  backup_conflicts common linux
   stow_packages common linux
   install_vundle
   setup_markdown_preview_yarn
