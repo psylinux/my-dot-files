@@ -3,6 +3,9 @@
 
 export PATH="$HOME/.local/bin:$PATH"
 export EDITOR="vim"
+if [ -d /usr/lib/jvm/default-java ]; then
+  export JAVA_HOME="/usr/lib/jvm/default-java"
+fi
 
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)

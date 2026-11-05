@@ -34,10 +34,16 @@ install_packages_apt() {
     libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev
     libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
     fzf ripgrep silversearcher-ag default-jre-headless nodejs
-    unzip fontconfig zsh
+    unzip fontconfig zsh gdb xclip
   )
   log "Installing base packages (${#packages_common[@]})"
   sudo apt-get install -y "${packages_common[@]}"
+
+  # Ubuntu's nodejs ships without npm (NodeSource's bundles it), so add it only when missing.
+  if ! command -v npm >/dev/null 2>&1; then
+    log "npm not bundled with nodejs; installing npm package"
+    sudo apt-get install -y npm
+  fi
 }
 
 install_ctags_apt() {
@@ -153,7 +159,8 @@ install_markdown_preview_deps() {
     if ! (cd "${plugin_app}" && yarn install); then
       log "Warning: yarn install failed; attempting npm install"
     else
-      return
+      # Explicit 0: a bare return here would pass on the failed `if !` test status and trip set -e.
+      return 0
     fi
   fi
 
@@ -176,6 +183,10 @@ install_gef() {
 
   local gdb_py
   gdb_py="$(gdb -q -nx -ex "python import sys; print(sys.executable)" -ex quit 2>/dev/null | tail -n 1 || true)"
+  # Ubuntu's gdb reports /usr/bin/python, which only exists there as python3.
+  if [ -n "$gdb_py" ] && [ ! -x "$gdb_py" ] && [ -x "${gdb_py}3" ]; then
+    gdb_py="${gdb_py}3"
+  fi
   if [ -z "$gdb_py" ] || [ ! -x "$gdb_py" ]; then
     log "Could not detect gdb's Python; falling back to python3 for GEF deps."
     gdb_py="$(command -v python3 || true)"
@@ -198,9 +209,8 @@ end
 source /opt/gef/gef.py
 EOF
 
-  if [ -d "${HOME}/.gef-extras" ]; then
-    rm -rf "${HOME}/.gef-extras"
-  fi
+  # gef-extras.sh clones into ~/.config/gef-extras (or ~/.gef-extras without ~/.config); clear both so re-runs can clone.
+  rm -rf "${HOME}/.gef-extras" "${HOME}/.config/gef-extras"
   /opt/gef/scripts/gef-extras.sh || log "Warning: gef-extras install hit an error."
 }
 
@@ -306,7 +316,7 @@ ensure_fzf_version() {
 
   mkdir -p "${HOME}/.local/bin"
   local archive="fzf-${FZF_MIN_VERSION}-linux_amd64.tar.gz"
-  local url="https://github.com/junegunn/fzf/releases/download/${FZF_MIN_VERSION}/${archive}"
+  local url="https://github.com/junegunn/fzf/releases/download/v${FZF_MIN_VERSION}/${archive}"
   local tmp
   tmp="$(mktemp)"
 
@@ -492,7 +502,6 @@ remove_stale_symlinks() {
     ".ssh/config"
     ".tmux.conf"
     ".vimrc"
-    ".vim"
     ".irssi"
     ".git-prompt.sh"
   )
