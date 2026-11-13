@@ -231,3 +231,9 @@ _nvm_complete() {
 }
 complete -o default -F _nvm_complete nvm 2>/dev/null || true
 export PATH="$HOME/.cargo/bin:$PATH"
+
+# AWS: log in to a profile if needed and set AWS_PROFILE in this shell (awsc <profile> [-f]).
+# Defined only where the aws-connect.sh helper is installed; if/fi keeps the exit status 0 without it.
+if [ -r "$HOME/.local/bin/aws-connect.sh" ]; then
+  alias awsc='source "$HOME/.local/bin/aws-connect.sh"'
+fi

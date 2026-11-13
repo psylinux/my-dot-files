@@ -9,7 +9,7 @@ This repo centralizes personal dotfiles plus bootstrap/install scripts for Linux
 - `scripts/_template.sh` is the starter for adding new helper scripts under `scripts/`.
 - `stow/linux` contains Linux dotfiles and managed helpers in `stow/linux/.local/bin/`.
 - `stow/mac` contains macOS dotfiles (`.zshrc`, `.p10k.zsh`, `.tmux.conf`, `.gitconfig`, `.gnupg/*`).
-- `stow/common` holds files shared by both platforms (`.vimrc` and the global git ignore list `.config/git/ignore`). Both bootstrap scripts stow it alongside their platform package.
+- `stow/common` holds files shared by both platforms (`.vimrc`, the global git ignore list `.config/git/ignore`, and the sourced `aws-connect.sh` helper in `.local/bin`, which has no `set -euo pipefail` because it runs inside the caller's shell). Both bootstrap scripts stow it alongside their platform package.
 - `stow/linux/.ssh/config` is tracked; do not commit private keys or secrets. The repo is public.
 - Stowed files are symlinks into this repo, so anything that writes to them edits tracked files. Always stow with `--no-folding` (so apps never write into `stow/`), and never call `git config --global` from bootstrap code.
 

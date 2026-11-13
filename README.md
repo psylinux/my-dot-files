@@ -9,7 +9,7 @@ Dotfiles for Linux and macOS managed with GNU Stow.
 - `scripts/_template.sh`: template for new scripts in `scripts/`.
 - `stow/linux`: Linux shell/git/tmux/ssh files and helper scripts in `.local/bin`.
 - `stow/mac`: macOS zsh/tmux/git/GPG files.
-- `stow/common`: files shared by both platforms (`.vimrc` and the global git ignore list at `.config/git/ignore`).
+- `stow/common`: files shared by both platforms (`.vimrc`, the global git ignore list at `.config/git/ignore`, and the `aws-connect.sh` helper in `.local/bin`).
 - `Makefile`: shortcuts for lint/syntax checks, stow dry-run, and direct bootstrap runs.
 
 ## One-shot install
@@ -72,6 +72,13 @@ Files in `stow/linux/.local/bin/` are stowed as symlinks into `~/.local/bin/`:
 
 Important:
 - Existing regular files in `~/.local/bin` with the same names are backed up by bootstrap before stowing.
+
+## AWS profile helper (`awsc`)
+`stow/common/.local/bin/aws-connect.sh` is stowed to `~/.local/bin/` on both platforms, and the zsh/bash rc files define `awsc` when it is present:
+- `awsc <profile>` logs in only if the profile's credentials fail, prints the caller identity and region, and sets `AWS_PROFILE` and `AWS_PAGER=""` in the current shell. `-f` forces a login.
+- The login step follows the profile: `aws login` (console sign-in), `aws sso login`, or none for static keys and role/credential-process profiles.
+- Over SSH, or on Linux without a display, it logs in remotely (`aws login --remote`, `aws sso login --use-device-code`): open the printed URL on any device. `-r` forces this.
+- Needs AWS CLI v2 (2.32 or later for `aws login`). The bootstraps do not install it or any credentials.
 
 ## Helpful commands
 - `make check`: syntax check for install/bootstrap scripts (`bash -n`).

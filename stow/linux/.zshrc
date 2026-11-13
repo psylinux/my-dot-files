@@ -65,3 +65,9 @@ if [[ -o login ]] && command -v mount-shared-folders.sh >/dev/null 2>&1; then
   mount-shared-folders.sh
 fi
 export PATH="$HOME/.cargo/bin:$PATH"
+
+# AWS: log in to a profile if needed and set AWS_PROFILE in this shell (awsc <profile> [-f]).
+# Defined only where the aws-connect.sh helper is installed; if/fi keeps the exit status 0 without it.
+if [[ -r "$HOME/.local/bin/aws-connect.sh" ]]; then
+  alias awsc='source "$HOME/.local/bin/aws-connect.sh"'
+fi
