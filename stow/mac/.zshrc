@@ -121,5 +121,8 @@ export PATH="$HOME/.local/bin:$PATH"
 # Machine-specific settings (paths, tool locations) live in ~/.zshrc.local, outside this repo
 [[ -f "$HOME/.zshrc.local" ]] && source "$HOME/.zshrc.local"
 
-# AWS: log in to a profile if needed and set AWS_PROFILE in this shell (awsc <profile> [-f])
-alias awsc='source "$HOME/.local/bin/aws-connect.sh"'
+# AWS: log in to a profile if needed and set AWS_PROFILE in this shell (awsc <profile> [-f]).
+# Defined only where the aws-connect.sh helper is installed; if/fi keeps the exit status 0 without it.
+if [[ -r "$HOME/.local/bin/aws-connect.sh" ]]; then
+  alias awsc='source "$HOME/.local/bin/aws-connect.sh"'
+fi
