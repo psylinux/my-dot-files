@@ -118,3 +118,6 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
 export PATH="$HOME/.local/bin:$PATH"
+
+# AWS: log in to a profile if needed and set AWS_PROFILE in this shell (awsc <profile> [-f])
+alias awsc='source "$HOME/.local/bin/aws-connect.sh"'
