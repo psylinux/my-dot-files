@@ -16,3 +16,9 @@
 # Machine-local settings (e.g. safe.directory for engagement paths) live in this untracked file.
 [include]
 	path = ~/.gitconfig.local
+[credential "https://github.com"]
+	helper = 
+	helper = !/home/cowboy/.local/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/home/cowboy/.local/bin/gh auth git-credential
